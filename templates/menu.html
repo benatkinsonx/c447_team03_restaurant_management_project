@@ -27,6 +27,24 @@
                 </th>
             </tr>
 
+            {% for item in item_menu}
+            <tr>
+                <td>
+                    {{ item.item_name }}
+                </td>
+                <td>
+                    {{ item.item_description }}
+                </td>
+                <td>
+                    {{ item.item_cat }}
+                </td>
+                <td>
+                    {{ item.item_price }}
+                </td>
+            </tr>
+        {% else %}
+            <p>No menu items available</p>
+
         </table>
 
 </body>
