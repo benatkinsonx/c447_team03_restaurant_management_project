@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Menu</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Admin Menu</h1>
+    
+    {% if menu_items %}
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Vegetarian</th>
+                <th>Price</th>
+                <th>Available</th>
+                <th>Change</th>
+                <th>Delete</th>
+            </tr>
+
+            {% for item in menu_items %}
+            <tr>
+                <td>{{ item.menu_id }}</td>
+                <td>{{ item.item_name }}</td>
+                <td>{{ item.category }}</td>
+                <td>
+                    {% if item.is_veg %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>£{{ item.price }}</td>
+                <td>
+                    {% if item.is_available %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No menu items available</p>
+    {% endif %}
+
+    <br>
+    <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>
