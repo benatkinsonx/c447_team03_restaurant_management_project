@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from routes.checkout import checkout
 from routes.auth import auth
 from routes.dashboard import dashboard_route
 
@@ -7,7 +8,7 @@ app.secret_key = "boo"
 
 app.register_blueprint(auth)
 app.register_blueprint(dashboard_route)
-
+app.register_blueprint(checkout)
 
 @app.route("/")
 def index():

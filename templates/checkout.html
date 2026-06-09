@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Enter Payment Details</h1>
+
+    <form action="/voucher" method="post">
+        <h3>1. Voucher Code (Optional)</h3>
+        <input type="text" name="voucher_code" placeholder="Enter voucher code"><br><br>
+
+        <h2>{{ message }}</h2>
+
+        <p>Total: £{{ "%.2f"|format(total) }}</p>
+    </form>
+
+    <form action="/pay" method="post">
+        <h3>2. Delivery</h3>
+        <input type="radio" id="collection" name="delivery" value="collection" required>
+        <label for="collection">Collection</label><br>
+        <input type="radio" id="delivery" name="delivery" value="delivery">
+        <label for="delivery">Delivery (+ £5.00)</label><br><br>
+
+        <h3>3. Payment Details</h3>
+        <input type="hidden" name="total" value="{{ total }}">
+
+        <label>Card Number: </label>
+        <input
+            type="text"
+            name="card_number"
+            placeholder="1234 5678 9012 3456"
+            pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+            required
+        ><br><br>
+        <label>CVV: </label>
+        <input
+            type="text"
+            name="cvv"
+            placeholder="123"
+            pattern="[0-9]{3}"
+            required
+        ><br><br>
+
+        <button type="submit">Pay</button>
+    </form>
+
+</body>
+</html>
