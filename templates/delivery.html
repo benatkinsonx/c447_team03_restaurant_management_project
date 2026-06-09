@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <form action="/delivery" method="post">
+        <h3>2. Delivery</h3>
+        <input type="radio" id="collection" name="delivery" value="collection" required>
+        <label for="collection">Collection</label><br>
+        <input type="radio" id="delivery" name="delivery" value="delivery">
+        <label for="delivery">Delivery (+ £5.00)</label><br><br>
+
+        <button type="submit">Next</button>
+    </form>
+
+</body>
+</html>

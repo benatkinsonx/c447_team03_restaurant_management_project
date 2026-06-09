@@ -7,9 +7,21 @@ from db import get_connection
 
 checkout = Blueprint("checkout", __name__)
 
-@checkout.route('/pay', methods=['POST'])
-def pay():
-    return  """
-            <h1>Payments Complete!</h1>
-            <p>The payment has been completed successfully.</p><a href='/'>go back home to log in</a>
-            """
+@checkout.route('/voucher', methods=['GET','POST'])
+def voucher():
+    if request.method == 'GET':
+        total = request.form.get('total', 25.00)
+        return render_template('voucher.html', total=total, message="voucher is valid/invalid")
+    return render_template('delivery.html')
+
+@checkout.route('/delivery', methods=['POST'])
+def delivery():
+    return render_template('payment.html')
+
+@checkout.route('/payment', methods=['POST'])
+def payment():
+    return f"""
+            <h1>Payment Successful!</h1>
+            <p>The order has been placed successfully.</p>
+            <a href="/dashboard">Go to Dashboard</a>
+        """
