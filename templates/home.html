@@ -1,0 +1,123 @@
+{% extends "index.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block home_active %}active{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="et-hero-tabs" id="home">
+        <h1>WELCOME TO AURA</h1>
+        <h3>Experience Culinary Excellence</h3>
+    </section>
+
+
+    <!-- Slideshow Section -->
+    <section class="slideshow-section">
+        <div class="slideshow-container">
+            <div class="slide fade">
+                <img src="{{ url_for('static', filename='images/restaurant1.jpg') }}" alt="Restaurant interior">
+                <div class="slide-caption">
+                    <h2>Elegant Ambiance</h2>
+                    <p>Perfect for any occasion</p>
+                </div>
+            </div>
+            <div class="slide fade">
+                <img src="{{ url_for('static', filename='images/signaturedish1.jpg') }}" alt="Signature dish">
+                <div class="slide-caption">
+                    <h2>Signature Dishes</h2>
+                    <p>Crafted with passion</p>
+                </div>
+            </div>
+            <div class="slide fade">
+                <img src="{{ url_for('static', filename='images/chefs1.jpg') }}" alt="Chef at work">
+                <div class="slide-caption">
+                    <h2>World-Class Chefs</h2>
+                    <p>Bringing flavors to life</p>
+                </div>
+            </div>
+            <div class="slide fade">
+                <img src="{{ url_for('static', filename='images/wine1.jpg') }}" alt="Wine selection">
+                <div class="slide-caption">
+                    <h2>Fine Wines</h2>
+                    <p>Curated selection from around the world</p>
+                </div>
+            </div>
+
+            <a class="prev" onclick="plusSlides(-1)">❮</a>
+            <a class="next" onclick="plusSlides(1)">❯</a>
+
+            <div class="dots-container">
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+                <span class="dot" onclick="currentSlide(4)"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Content -->
+    <section class="featured">
+        <div class="featured-container">
+            <div class="featured-card">
+                <h3>🍽️ Fine Dining</h3>
+                <p>Experience the finest culinary creations in an elegant atmosphere.</p>
+            </div>
+            <div class="featured-card">
+                <h3>🍷 Wine Selection</h3>
+                <p>Curated wine list featuring the best vintages from around the world.</p>
+            </div>
+            <div class="featured-card">
+                <h3>5⭐️ Customer service </h3>
+                <p>Reviewed by you, food critics and food inspectors.</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex-1].style.display = "block";
+            dots[slideIndex-1].className += " active";
+        }
+
+        // Auto slideshow
+        let autoSlideIndex = 0;
+        autoShowSlides();
+
+        function autoShowSlides() {
+            let i;
+            let slides = document.getElementsByClassName("slide");
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            autoSlideIndex++;
+            if (autoSlideIndex > slides.length) {autoSlideIndex = 1}
+            slides[autoSlideIndex-1].style.display = "block";
+            setTimeout(autoShowSlides, 5000);
+        }
+    </script>
+{% endblock %}
