@@ -43,6 +43,14 @@
                         No
                     {% endif %}
                 </td>
+                <td>
+                    <a href="/admin/menu/change/{{ item.menu_id }}">
+                        <button type="button">Change</button>
+                    </a>
+                </td>
+                <td>
+                    <button type="button">Delete</button>
+                </td>
             </tr>
             {% endfor %}
         </table>

@@ -11,11 +11,12 @@ def is_admin_owner():
 
 @menu_bp.route("/admin/menu", methods=["GET"])
 def admin_menu():
-    if not is_admin_owner():
-        return """
-            <p>Not admin</p>
-            <a href="/customer/menu">view customer table</a>
-        """
+    # Uncomment this later when admin login works properly
+    # if not is_admin_owner():
+    #     return """
+    #         <p>Not admin</p>
+    #         <a href="/customer/menu">View customer menu</a>
+    #     """, 403
 
     db = None
     cursor = None
@@ -40,8 +41,6 @@ def admin_menu():
 
         menu_items = cursor.fetchall()
 
-        print("MENU ITEMS:", menu_items)
-
         return render_template("admin_menu.html", menu_items=menu_items)
 
     except mysql.connector.Error as err:
@@ -49,7 +48,7 @@ def admin_menu():
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/dashboard">Go Back</a>
-        """
+        """, 500
 
     finally:
         if cursor:
@@ -57,8 +56,12 @@ def admin_menu():
         if db:
             db.close()
 
+
 @menu_bp.route("/customer/menu", methods=["GET"])
 def customer_menu():
+    db = None
+    cursor = None
+
     try:
         db = get_connection()
         cursor = db.cursor(dictionary=True)
@@ -74,12 +77,11 @@ def customer_menu():
                 Category.category_desc
             FROM MenuItems
             JOIN Category ON MenuItems.cat_id = Category.cat_id
+            WHERE MenuItems.is_available = TRUE
             ORDER BY Category.category, MenuItems.item_name
         """)
 
         menu_items = cursor.fetchall()
-
-        print("MENU ITEMS:", menu_items)
 
         return render_template("customer_menu.html", menu_items=menu_items)
 
@@ -88,10 +90,15 @@ def customer_menu():
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/dashboard">Go Back</a>
-        """
+        """, 500
 
     finally:
         if cursor:
             cursor.close()
         if db:
             db.close()
+
+
+@menu_bp.route("/admin/menu/change/<int:menu_id>", methods=["GET"])
+def show_change_page(menu_id):
+    return render_template("change_menu.html", menu_id=menu_id)

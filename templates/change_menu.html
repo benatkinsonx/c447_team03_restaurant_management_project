@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+</head>
+
+<body>
+    <h1>Register New Account</h1>
+
+    <form action="/change" method="post">
+
+        <h3>Change menu items</h3>
+        <label>Item name:</label><br>
+        <input type="text" name="item_name" required />
+        <br><br>
+
+        <label>Category:</label><br>
+        <select>
+            <option value="Food">
+                Food
+            </option>
+            <option value="Merchandise">
+                Merchandise
+            </option>
+        </select>
+        <br><br>
+
+        <label>Veg:</label><br>
+        <select>
+            <option value="True">
+                True
+            </option>
+            <option value="False">
+                False
+            </option>
+        </select>
+        <br><br>
+
+        <label>Price:</label><br>
+        <input type="price" name="price" required />
+        <br><br>
+
+        <label>Available:</label><br>
+        <select>
+            <option value="True">
+                True
+            </option>
+            <option value="False">
+                False
+            </option>
+        </select>
+
+        <button type="submit">
+            SAVE
+        </button>
+        <a href="/admin/menu">Cancel</a>
+    </form>
+</body>
+
+</html>
