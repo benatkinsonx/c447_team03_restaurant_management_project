@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Admin Menu</h1>
+    <h1>Customer Menu</h1>
+
+    <a href="/basket"> view basket </a>
     
+    <br>
     {% if menu_items %}
         <table border="1" cellpadding="8">
             <tr>
@@ -19,6 +22,7 @@
                 <th>Vegetarian</th>
                 <th>Price</th>
                 <th>Available</th>
+                <th>Add to basket</th>
             </tr>
 
             {% for item in menu_items %}
@@ -40,6 +44,12 @@
                     {% else %}
                         No
                     {% endif %}
+                </td>
+                <td>
+                    <form action="/basket/add/{{ item.menu_id }}" method="post">
+                        <input type="number" name="quantity" value="1" min="1" required>
+                        <button type="submit">Add</button>
+                    </form> 
                 </td>
             </tr>
             {% endfor %}

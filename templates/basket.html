@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Menu</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+        <h1>
+            Basket
+        </h1>
+
+        {% if basket_items %}
+            <table border="1" cellpadding="8">
+                <tr>
+                    <th>
+                        Item
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Quantity
+                    </th>
+                    <th>
+                        Subtotal
+                    </th>
+                    <th>
+                        Remove
+                    </th>
+                </tr>
+
+                {% for item in basket_items %}
+                <tr>
+                    <td> 
+                    {{ item.item_name}}
+                    </td>
+                    <td>
+                        {{ item.price }}
+                    </td>
+                    <td>
+                        {{ item.quantity }}
+                    </td>
+                    <td>
+                        £{{ "%.2f"|format(item.subtotal) }}
+                    </td>
+                    <td>
+                        <a href="/basket/remove/{{ item.menu_id}}">
+                            <button type="button">
+                                Remove
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <h3> Total: £{{ "%.2f"|format(total) }}</h3>
+
+        {% else %}
+            <p>Empty Basket</p>
+        {% endif %}
+
+        <br>
+        <a href="/customer/menu"> back to menu</a>
+</body>
+</html>
