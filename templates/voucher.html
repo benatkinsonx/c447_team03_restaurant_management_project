@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <form action="/voucher" method="post">
+        <h3>1. Voucher Code (Optional)</h3>
+        <input type="text" name="voucher_code" placeholder="Enter voucher code"><br><br>
+
+        <h2>{{ message }}</h2>
+
+        <p>Total: £{{ "%.2f"|format(total) }}</p>
+
+        <button type="submit">Next</button>
+    </form>
+
+</body>
+</html>
