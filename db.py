@@ -3,7 +3,7 @@ import os
 
 def get_connection():
     return mysql.connector.connect(
-        host = os.getenv("host")
+        host = os.getenv("host"),
         user = os.getenv("user"),
         password = os.getenc("password"),
         database = os.getenv("database"),

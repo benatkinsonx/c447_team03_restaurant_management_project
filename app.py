@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from db import *
 
 from routes.auth import auth
 from routes.dashboard import dashboard_route
@@ -7,7 +6,6 @@ from routes.dashboard import dashboard_route
 app = Flask(__name__)
 app.secret_key = "boo"
 
-mysql = get_connection()
 
 
 app.register_blueprint(auth)
