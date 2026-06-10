@@ -84,9 +84,6 @@ def delivery():
 def payment():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
-    
-    print("Voucher:", session.get('entered_voucher_code'))
-    print("User:", session.get('user_id'))
 
     db = get_connection()
     cursor = db.cursor(dictionary=True)
