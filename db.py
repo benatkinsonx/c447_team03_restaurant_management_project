@@ -1,27 +1,14 @@
 import mysql.connector
-<<<<<<< HEAD
-import os
-
-def get_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME"),
-        port=os.getenv("DB_PORT")
-    )
-=======
 import os 
 
 def get_connection():
     return mysql.connector.connect(
-        host = os.getenv("host"),
-        user = os.getenv("user"),
-        password = os.getenc("password"),
-        database = os.getenv("database"),
-        port = os.getenv("port")
+        host=os.getenv("host"),
+        user=os.getenv("user"),
+        password=os.getenv("password"),
+        database=os.getenv("database"),
+        port=int(os.getenv("port")) if os.getenv("port") else 3306
     )
-
 
 def create_booking():
     conn = get_connection()
@@ -44,4 +31,6 @@ def create_booking():
                     FOREIGN KEY (table_id) REFERENCES RestaurantTables(table_id)
             );
         ''')
->>>>>>> 5111370 (Creation of main home page and tempates for many of the pages that will be included, creating a connection  to the db and adding the reservation table, added some logic and a basic form for the booking page, yet to hook up to the db as users and other tables are needed. CSS for the pages included, add as you go along)
+        conn.commit()
+        cursor.close()
+        conn.close()
