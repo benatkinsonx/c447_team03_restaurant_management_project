@@ -10,15 +10,14 @@
 <body>
 
     <form action="/delivery" method="post">
-        <h3>2. Delivery</h3>
+        <h2>2. Delivery</h3>
         <input type="radio" id="collection" name="delivery" value="collection" required>
         <label for="collection">Collection</label><br>
         <input type="radio" id="delivery" name="delivery" value="delivery">
         <label for="delivery">Delivery (+ £5.00)</label><br><br>
 
-        <h2>{{ message }}</h2>
-
-        <p>Total: £{{ "%.2f"|format(total) }}</p>
+        <h4>{{ message|safe }}</h4><br><br>
+        <h4>Total: £{{ "%.2f"|format(total) }}</h4><br><br>
 
         <button type="submit">Next</button>
     </form>

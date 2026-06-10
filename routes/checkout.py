@@ -11,7 +11,18 @@ checkout = Blueprint("checkout", __name__)
 def gotocheckout():
     session['total'] = 78
     total = session['total']
-    return render_template('voucher.html', total=total, message="")
+
+    user_id = session['user_id']
+    points_query = """
+        SELECT reward_points
+        FROM Users
+        WHERE user_id = %s
+    """
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute(points_query, (user_id,))
+    user_points = cursor.fetchone()
+    return render_template('voucher.html', total=total, curr_reward_points=f"{user_points['reward_points']}", message="")
 
 @checkout.route('/voucher', methods=['POST'])
 def voucher():
@@ -20,28 +31,33 @@ def voucher():
     
     try:
         db = get_connection()
-        cursor = db.cursor()
+        cursor = db.cursor(dictionary=True)
 
-        voucher_code = request.form.get('voucher_code')
+        # ===== voucher code handling =====
+        entered_voucher_code = request.form.get('voucher_code')
+        session['entered_voucher_code'] = entered_voucher_code
 
-        voucher_name_query = """
-            SELECT reward_name
+        voucher_query = """
+            SELECT reward_name, cost_multiplier, points
             FROM Rewards
             WHERE reward_name = %s AND active = TRUE
     """
-        cursor.execute(voucher_name_query, (voucher_code,))
-        voucher_name_result = cursor.fetchone()
-    
-        if voucher_name_result:
-            cost_multiplier_query = """
-                SELECT cost_multiplier
-                FROM Rewards
-                WHERE reward_name = %s AND active = TRUE
-            """
-            cursor.execute(cost_multiplier_query, (voucher_code,))
-            cost_multiplier_result = cursor.fetchone()
-            session['discounted_total'] = session['total'] * cost_multiplier_result[0]
-            return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher_code}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}")
+        cursor.execute(voucher_query, (entered_voucher_code,))
+        voucher = cursor.fetchone()
+
+        # ===== user points handling =====
+        user_id = session['user_id']
+        points_query = """
+            SELECT reward_points
+            FROM Users
+            WHERE user_id = %s
+        """
+        cursor.execute(points_query, (user_id,))
+        user_points = cursor.fetchone()
+
+        if voucher['reward_name'] == entered_voucher_code and user_points['reward_points'] >= voucher['points']:
+            session['discounted_total'] = session['total'] * voucher['cost_multiplier']
+            return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.")
         else:
             return render_template('voucher.html', total=session['total'], message="Invalid voucher code. Try again or proceed without a voucher.")
     
@@ -68,6 +84,27 @@ def delivery():
 def payment():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
+    
+    print("Voucher:", session.get('entered_voucher_code'))
+    print("User:", session.get('user_id'))
+
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+
+    points_update_query = """
+        UPDATE Users
+        SET reward_points = reward_points - (
+            SELECT points
+            FROM Rewards
+            WHERE reward_name = %s
+        )
+        WHERE user_id = %s
+    """
+    entered_voucher_code = session.get('entered_voucher_code')
+    user_id = session['user_id']
+    cursor.execute(points_update_query, (entered_voucher_code, user_id))
+    db.commit()
+
     
     return f"""
             <h1>Payment Successful!</h1>
