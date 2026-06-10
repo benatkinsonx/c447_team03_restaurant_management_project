@@ -10,6 +10,9 @@
 <body>
     <form action="/payment" method="post">
         <h2>3. Payment Details</h2>
+        <h3>Total: £{{ "%.2f"|format(total) }}</h3>
+
+        
         <input type="hidden" name="total" value="{{ total }}">
 
         <label>Card Number: </label>

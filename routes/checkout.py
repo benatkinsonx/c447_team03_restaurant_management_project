@@ -34,7 +34,7 @@ def voucher():
         cursor = db.cursor(dictionary=True)
 
         # ===== voucher code handling =====
-        entered_voucher_code = request.form.get('voucher_code')
+        entered_voucher_code = request.form.get('voucher_code').upper()
         session['entered_voucher_code'] = entered_voucher_code
 
         voucher_query = """
@@ -55,12 +55,14 @@ def voucher():
         cursor.execute(points_query, (user_id,))
         user_points = cursor.fetchone()
 
-        if voucher is not None:
+        if voucher:
             if voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') >= voucher['points']:
                 session['discounted_total'] = session['total'] * voucher['cost_multiplier']
                 return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.")
-            elif voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') >= voucher['points']:
+            elif voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') <= voucher['points']:
                 return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message=f"Not enough reward points for voucher '{voucher['reward_name']}'. You have {user_points['reward_points']} points but the voucher requires {voucher['points']} points. Try again or proceed without a voucher.")
+            else:
+                return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
         else:
             return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
     
@@ -81,7 +83,16 @@ def delivery():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
     
-    return render_template('payment.html')
+    delivery_option = request.form.get('delivery')
+    
+    if session.get('discounted_total'):
+        if delivery_option == 'delivery':
+            session['discounted_total'] += 5.00
+    else:
+        if delivery_option == 'delivery':
+            session['total'] += 5.00
+    
+    return render_template('payment.html', total=session.get('discounted_total', session['total']))
 
 @checkout.route('/payment', methods=['POST'])
 def payment():
