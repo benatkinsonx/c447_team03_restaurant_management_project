@@ -55,11 +55,14 @@ def voucher():
         cursor.execute(points_query, (user_id,))
         user_points = cursor.fetchone()
 
-        if voucher['reward_name'] == entered_voucher_code and user_points['reward_points'] >= voucher['points']:
-            session['discounted_total'] = session['total'] * voucher['cost_multiplier']
-            return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.")
+        if voucher is not None:
+            if voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') >= voucher['points']:
+                session['discounted_total'] = session['total'] * voucher['cost_multiplier']
+                return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.")
+            elif voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') >= voucher['points']:
+                return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message=f"Not enough reward points for voucher '{voucher['reward_name']}'. You have {user_points['reward_points']} points but the voucher requires {voucher['points']} points. Try again or proceed without a voucher.")
         else:
-            return render_template('voucher.html', total=session['total'], message="Invalid voucher code. Try again or proceed without a voucher.")
+            return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
     
     except mysql.connector.Error as err:
         return f"""
