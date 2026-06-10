@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-from flask import Flask, render_template
-from routes.checkout import checkout
-=======
-from flask import Flask, render_template, request
 
->>>>>>> 5111370 (Creation of main home page and tempates for many of the pages that will be included, creating a connection  to the db and adding the reservation table, added some logic and a basic form for the booking page, yet to hook up to the db as users and other tables are needed. CSS for the pages included, add as you go along)
+from flask import Flask, render_template, request
+from routes.checkout import checkout
+
 from routes.auth import auth
 from routes.dashboard import dashboard_route
 from routes.menu import menu_bp

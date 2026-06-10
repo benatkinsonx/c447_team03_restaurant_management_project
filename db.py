@@ -7,7 +7,7 @@ def get_connection():
         user=os.getenv("user"),
         password=os.getenv("password"),
         database=os.getenv("database"),
-        port=int(os.getenv("port")) if os.getenv("port") else 3306
+        port=int(os.getenv("port"))
     )
 
 def create_booking():
