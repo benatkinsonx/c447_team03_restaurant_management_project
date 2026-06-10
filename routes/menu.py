@@ -252,3 +252,8 @@ def view_basket():
             cursor.close()
         if db:
             db.close()
+
+@menu_bp.route("/gotocheckout", methods=["POST"])
+def gotocheckout():
+    total = request.form.get('total', 25.00)
+    return render_template('voucher.html', total=total, message="voucher is valid/invalid")
