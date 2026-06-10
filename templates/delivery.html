@@ -16,6 +16,10 @@
         <input type="radio" id="delivery" name="delivery" value="delivery">
         <label for="delivery">Delivery (+ £5.00)</label><br><br>
 
+        <h2>{{ message }}</h2>
+
+        <p>Total: £{{ "%.2f"|format(total) }}</p>
+
         <button type="submit">Next</button>
     </form>
 
