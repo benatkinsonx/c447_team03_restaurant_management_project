@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Blueprint
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -65,6 +67,8 @@ def voucher():
                 return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message=f"Not enough reward points for voucher '{voucher['reward_name']}'. You have {user_points['reward_points']} points but the voucher requires {voucher['points']} points. Try again or proceed without a voucher.")
             else:
                 return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
+        elif entered_voucher_code == "":
+            return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="")
         else:
             return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
     
@@ -118,7 +122,18 @@ def payment():
     cursor.execute(points_update_query, (entered_voucher_code, user_id))
     db.commit()
 
-    
+    payments_log_query = """
+        INSERT INTO Payments (order_id, amount, payment_status, payment_date)
+        VALUES (%s, %s, %s, %s)
+    """
+    order_id = session.get('order_id')
+    amount = session.get('discounted_total', session['total'])
+    payment_status = 'completed'
+    payment_date = datetime.now()
+
+    cursor.execute(payments_log_query, (order_id, amount, payment_status, payment_date))
+    db.commit()
+
     return f"""
             <h1>Payment Successful!</h1>
             <p>The order has been placed successfully.</p>
