@@ -2,10 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_connection
-
+import jwt
+from datetime import datetime, timedelta, timezone
 
 
 auth = Blueprint("auth", __name__)
+
+# testing purpise only move to env after
+JWT_s = "test"
+JWT_a = "HS256"
 
 
 @auth.route('/register', methods=['GET'])
@@ -44,6 +49,7 @@ def register():
         cursor.execute(address_sql, address_val)
 
         # newly generated ID for the foreign key reference
+
         addr_id = cursor.lastrowid
         
 
@@ -55,6 +61,30 @@ def register():
         """
         user_val = (addr_id, first_name, last_name, email, password_hash, phone_num)
         cursor.execute(user_sql, user_val)
+
+        user_id = cursor.lastrowid
+
+        session["user_id"] = user_id
+        session["email"] = email
+        session["first_name"] = first_name
+        session["role_id"] = 1
+
+        # Create JWT token
+        token = jwt.encode(
+            {
+                "user_id": user_id,
+                "email": email,
+                "first_name": first_name,
+                "role_id": 1,
+                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+            },
+            JWT_s,
+            algorithm=JWT_a
+        )
+
+        session["jwt_token"] = token
+
+
 
         db.commit()
         
@@ -115,6 +145,20 @@ def login():
         session['email'] = user['email']
         session['first_name'] = user['first_name']
         session['role_id'] = user['role_id']
+
+        token = jwt.encode(
+            {
+                "user_id": user['user_id'],
+                "email": user["email"],
+                "role_id": user["role_id"],
+                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+            },
+            JWT_s,
+            algorithm=JWT_a
+        )
+
+        session["JWT_token"] = token
+
 
         return redirect(url_for("dashboard.dashboard"))
 
