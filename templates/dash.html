@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,8 +12,7 @@
     <a href="/logout">Logout</a>
     <br>
 
-    <!-- <a href="/menu">View Menu</a> -->
-
+    <a href="/menu">View Menu</a> 
     <br>
 
     <a href="/customer/menu">View menu</a>
@@ -23,4 +22,46 @@
 
     
 </body>
-</html>
+</html> -->
+
+{% extends "index.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to your dashboard</h1>
+
+<p>Hello, {{ session["first_name"] }}</p>
+<p>Email: {{ session["email"] }}</p>
+
+<h3>Customer Actions</h3>
+
+<a href="/customer/menu">
+    <button type="button">View Menu</button>
+</a>
+
+<a href="/basket">
+    <button type="button">View Basket</button>
+</a>
+
+<a href="/bookings">
+    <button type="button">Book a Table</button>
+</a>
+
+{% if session["role_id"] == 2 or session["role_id"] == 3 %}
+    <hr>
+    <h3>Admin / Owner Actions</h3>
+
+    <a href="/admin/menu">
+        <button type="button">Manage Menu</button>
+    </a>
+{% endif %}
+
+<br><br>
+
+<a href="{{ url_for('auth.logout') }}">
+    <button type="button">Logout</button>
+</a>
+
+{% endblock %}
