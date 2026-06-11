@@ -9,7 +9,9 @@ checkout = Blueprint("checkout", __name__)
 
 @checkout.route("/gotocheckout", methods=["POST"])
 def gotocheckout():
-    session['total'] = 78
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+    
     total = session['total']
 
     user_id = session['user_id']
