@@ -116,11 +116,7 @@ def login():
         session['first_name'] = user['first_name']
         session['role_id'] = user['role_id']
 
-        return f"""
-            <h1>Login Successful!</h1>
-            <p>Welcome, {user['first_name']}.</p>
-            <a href="/dashboard">Go to Dashboard</a>
-        """
+        return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         return f"""
