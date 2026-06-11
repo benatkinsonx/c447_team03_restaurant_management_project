@@ -116,6 +116,7 @@ def login():
         session['first_name'] = user['first_name']
         session['role_id'] = user['role_id']
 
+        # return render_template('dash.html')
         return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
