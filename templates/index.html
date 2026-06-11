@@ -11,7 +11,10 @@
     <!-- Sticky Navbar with Slider -->
     <div class="et-hero-tabs-container">
         <a href="{{ url_for('home') }}" class="et-hero-tab {% block home_active %}{% endblock %}">Home</a>
-        <a href="{{ url_for('bookings') }}" class="et-hero-tab {% block book_active %}{% endblock %}">Book</a>
+        <a href="/dashboard" class="et-hero-tab {% block dashboard_active %}{% endblock %}">Dashboard</a>
+        <a href="{{ url_for('bookings.bookings') }}" class="et-hero-tab {% block book_active %}{% endblock %}">Book</a>
+        <a href="/register" class="et-hero-tab {% block register_active %}{% endblock %}">Register</a>
+        <a href="/login" class="et-hero-tab {% block login_active %}{% endblock %}">Login</a>
 
 
         <span class="et-hero-tab-slider"></span>

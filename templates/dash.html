@@ -1,26 +1,75 @@
-<!DOCTYPE html>
+
+<!-- here -->
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookings</title>
+    <title>Dashboard</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>welcome to your dash</h1>
-    <a href="/logout">Logout</a>
-    <br>
 
-    <!-- <a href="/menu">View Menu</a> -->
+    <nav>
+        <a href="/">
+            <button type="button">Home</button>
+        </a>
 
-    <br>
+        <a href="/bookings">
+            <button type="button">Reservation</button>
+        </a>
 
-    <a href="/customer/menu">View menu</a>
-    <br>
-    <a href="/admin/menu">View admin menu</a>
+        <a href="/logout">
+            <button type="button">Logout</button>
+        </a>
+    </nav>
 
 
-    
+    <hr>
+
+    <h1>Dashboard</h1>
+
+    <h2>Welcome, {{ session["first_name"] }}</h2>
+    <p>Email: {{ session["email"] }}</p>
+
+    <hr>
+
+    <h3>Customer Options</h3>
+
+    <a href="/customer/menu">
+        <button type="button">View Menu</button>
+    </a>
+
+    <a href="/basket">
+        <button type="button">View Basket</button>
+    </a>
+
+    <a href="/bookings">
+        <button type="button">Make a Reservation</button>
+    </a>
+
+    <a href="/manage_bookings">
+        <button type="button">Manage Reservation</button>
+    </a>
+
+    <hr>
+
+    {% if session["role_id"] == 2 or session["role_id"] == 3 %}
+        <h3>Admin / Owner Options</h3>
+
+        <a href="/admin/menu">
+            <button type="button">Manage Menu</button>
+        </a>
+
+        <a href="/admin/users">
+            <button type="button">Manage Users</button>
+        </a>
+
+        <a href="/admin/orders">
+            <button type="button">View Orders</button>
+        </a>
+    {% endif %}
+
 </body>
 </html>
