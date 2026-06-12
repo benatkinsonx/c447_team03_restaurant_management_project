@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "index.html" %}
 
 {% block title %}Dashboard{% endblock %}
@@ -5,6 +6,36 @@
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
+=======
+
+<!-- here -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav>
+        <a href="/">
+            <button type="button">Home</button>
+        </a>
+
+        <a href="/bookings">
+            <button type="button">Reservation</button>
+        </a>
+
+        <a href="/logout">
+            <button type="button">Logout</button>
+        </a>
+    </nav>
+
+
+>>>>>>> origin/main
     <hr>
 
     <h1>Dashboard</h1>
@@ -26,6 +57,10 @@
 
     <a href="/bookings">
         <button type="button">Make a Reservation</button>
+    </a>
+
+    <a href="/manage_bookings">
+        <button type="button">Manage Reservation</button>
     </a>
 
     <hr>
