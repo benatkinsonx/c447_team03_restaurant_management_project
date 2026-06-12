@@ -1,26 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery</title>
+{% extends "index.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% block title %}Delivery{% endblock %}
 
-    <form action="/delivery" method="post">
-        <h2>2. Delivery</h3>
-        <input type="radio" id="collection" name="delivery" value="collection" required>
-        <label for="collection">Collection</label><br>
-        <input type="radio" id="delivery" name="delivery" value="delivery">
-        <label for="delivery">Delivery (+ £5.00)</label><br><br>
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="/delivery" method="post">
+                <h2>2. Delivery</h2>
 
-        <h4>{{ message|safe }}</h4><br><br>
-        <h4>Total: £{{ "%.2f"|format(total) }}</h4><br><br>
+                <div class="form-group">
+                    <input type="radio" id="collection" name="delivery" value="collection" required>
+                    <label for="collection">Collection</label>
+                </div>
+                <div class="form-group">
+                    <input type="radio" id="delivery" name="delivery" value="delivery">
+                    <label for="delivery">Delivery (+ £5.00)</label>
+                </div>
 
-        <button type="submit">Next</button>
-    </form>
+                <div class="form-group">
+                    <p class="message">{{ message|safe }}</p>
+                </div>
 
-</body>
-</html>
+                <div class="form-group">
+                    <label>Total</label>
+                    <p>£{{ "%.2f"|format(total) }}</p>
+                </div>
+
+                <button type="submit" class="submit-btn">Next</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

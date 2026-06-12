@@ -1,83 +1,37 @@
-<<<<<<< HEAD
 {% extends "index.html" %}
 
 {% block title %}Dashboard{% endblock %}
-
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
-=======
+    <section class="booking-form">
+        <div class="form-container">
+            <h1>Dashboard</h1>
+            <p class="message">Welcome, {{ session["first_name"] }}</p>
+            <p>Email: {{ session["email"] }}</p>
 
-<!-- here -->
- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+            <hr>
+            <h3>Customer Options</h3>
+            <div class="button-row">
+                <a href="/customer/menu" class="button">View Menu</a>
+                <a href="/basket" class="button secondary">View Basket</a>
+            </div>
+            <div class="button-row">
+                <a href="/bookings" class="button">Make a Reservation</a>
+                <a href="/manage_bookings" class="button secondary">Manage Reservation</a>
+            </div>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-
-    <nav>
-        <a href="/">
-            <button type="button">Home</button>
-        </a>
-
-        <a href="/bookings">
-            <button type="button">Reservation</button>
-        </a>
-
-        <a href="/logout">
-            <button type="button">Logout</button>
-        </a>
-    </nav>
-
-
->>>>>>> origin/main
-    <hr>
-
-    <h1>Dashboard</h1>
-
-    <h2>Welcome, {{ session["first_name"] }}</h2>
-    <p>Email: {{ session["email"] }}</p>
-
-    <hr>
-
-    <h3>Customer Options</h3>
-
-    <a href="/customer/menu">
-        <button type="button">View Menu</button>
-    </a>
-
-    <a href="/basket">
-        <button type="button">View Basket</button>
-    </a>
-
-    <a href="/bookings">
-        <button type="button">Make a Reservation</button>
-    </a>
-
-    <a href="/manage_bookings">
-        <button type="button">Manage Reservation</button>
-    </a>
-
-    <hr>
-
-    {% if session["role_id"] == 2 or session["role_id"] == 3 %}
-        <h3>Admin / Owner Options</h3>
-
-        <a href="/admin/menu">
-            <button type="button">Manage Menu</button>
-        </a>
-
-        <a href="/admin/users">
-            <button type="button">Manage Users</button>
-        </a>
-
-        <a href="/admin/orders">
-            <button type="button">View Orders</button>
-        </a>
-    {% endif %}
+            {% if session["role_id"] == 2 or session["role_id"] == 3 %}
+                <hr>
+                <h3>Admin / Owner Options</h3>
+                <div class="button-row">
+                    <a href="/admin/menu" class="button">Manage Menu</a>
+                    <a href="/admin/users" class="button secondary">Manage Users</a>
+                </div>
+                <div class="button-row">
+                    <a href="/admin/orders" class="button">View Orders</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}
