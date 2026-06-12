@@ -38,8 +38,8 @@ def voucher():
         cursor = db.cursor(dictionary=True)
 
         # ===== voucher code handling =====
-        entered_voucher_code = request.form.get('voucher_code').upper()
-        session['entered_voucher_code'] = entered_voucher_code
+        entered_voucher_code = (request.form.get('voucher_code') or '').strip().upper()
+        # don't store the code in session until we've validated it
 
         voucher_query = """
             SELECT reward_name, cost_multiplier, points
@@ -59,17 +59,32 @@ def voucher():
         cursor.execute(points_query, (user_id,))
         user_points = cursor.fetchone()
 
+        # if the user didn't enter a code, clear any previous voucher state and continue
+        if entered_voucher_code == "":
+            session.pop('discounted_total', None)
+            session.pop('entered_voucher_code', None)
+            return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="")
+
+        # validate voucher exists
         if voucher:
+            # valid voucher name found
             if voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') >= voucher['points']:
                 session['discounted_total'] = session['total'] * voucher['cost_multiplier']
+                session['entered_voucher_code'] = entered_voucher_code
                 return render_template('delivery.html', total=session['discounted_total'], message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.")
-            elif voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') <= voucher['points']:
+            # user doesn't have enough points
+            elif voucher.get('reward_name') == entered_voucher_code and user_points.get('reward_points') < voucher['points']:
+                session.pop('discounted_total', None)
+                session.pop('entered_voucher_code', None)
                 return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message=f"Not enough reward points for voucher '{voucher['reward_name']}'. You have {user_points['reward_points']} points but the voucher requires {voucher['points']} points. Try again or proceed without a voucher.")
             else:
-                return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
-        elif entered_voucher_code == "":
-            return render_template('delivery.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="")
+                session.pop('discounted_total', None)
+                session.pop('entered_voucher_code', None)
+                return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
         else:
+            # no matching voucher found
+            session.pop('discounted_total', None)
+            session.pop('entered_voucher_code', None)
             return render_template('voucher.html', total=session['total'], curr_reward_points=f"{user_points['reward_points']}", message="Invalid voucher code. Try again or proceed without a voucher.")
     
     except mysql.connector.Error as err:
@@ -108,30 +123,41 @@ def payment():
     db = get_connection()
     cursor = db.cursor(dictionary=True)
 
-    points_update_query = """
-        UPDATE Users
-        SET reward_points = reward_points - (
-            SELECT points
-            FROM Rewards
-            WHERE reward_name = %s
-        )
-        WHERE user_id = %s
-    """
+    # only deduct reward points if a voucher was applied and stored in session
     entered_voucher_code = session.get('entered_voucher_code')
-    user_id = session['user_id']
-    cursor.execute(points_update_query, (entered_voucher_code, user_id))
-    db.commit()
+    if entered_voucher_code:
+        points_update_query = """
+            UPDATE Users
+            SET reward_points = reward_points - (
+                SELECT points
+                FROM Rewards
+                WHERE reward_name = %s
+            )
+            WHERE user_id = %s
+        """
+        user_id = session['user_id']
+        cursor.execute(points_update_query, (entered_voucher_code, user_id))
+        db.commit()
 
-    payments_log_query = """
-        INSERT INTO Payments (order_id, amount, payment_status, payment_date)
-        VALUES (%s, %s, %s, %s)
-    """
+    user_id = session['user_id']
     order_id = session.get('order_id')
     amount = session.get('discounted_total', session['total'])
     payment_status = 'completed'
-    payment_date = datetime.now()
+    payment_date = datetime.datetime.now()
 
-    cursor.execute(payments_log_query, (order_id, amount, payment_status, payment_date))
+    if order_id is not None:
+        payments_log_query = """
+            INSERT INTO Payments (user_id, order_id, amount, payment_status, payment_date)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(payments_log_query, (user_id, order_id, amount, payment_status, payment_date))
+    else:
+        payments_log_query = """
+            INSERT INTO Payments (user_id, amount, payment_status, payment_date)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(payments_log_query, (user_id, amount, payment_status, payment_date))
+
     db.commit()
 
     return f"""
