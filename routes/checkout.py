@@ -139,24 +139,36 @@ def payment():
         cursor.execute(points_update_query, (entered_voucher_code, user_id))
         db.commit()
 
+    # ======================================
+    # orders table
+    # ======================================
+    order_insert_query = """
+        INSERT INTO Orders (user_id, order_date, order_status, total_price)
+        VALUES (%s, %s, %s, %s)
+    """
     user_id = session['user_id']
-    order_id = session.get('order_id')
+    order_date = datetime.datetime.now()
+    order_status = 'completed'
+    total_price = session.get('discounted_total', session['total'])
+
+    cursor.execute(order_insert_query, (user_id, order_date, order_status, total_price))
+    db.commit()
+    session['order_id'] = cursor.lastrowid
+
+    # ======================================
+    # payments logging
+    # ======================================
+
+    order_id = session['order_id']
     amount = session.get('discounted_total', session['total'])
     payment_status = 'completed'
     payment_date = datetime.datetime.now()
 
-    if order_id is not None:
-        payments_log_query = """
-            INSERT INTO Payments (user_id, order_id, amount, payment_status, payment_date)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(payments_log_query, (user_id, order_id, amount, payment_status, payment_date))
-    else:
-        payments_log_query = """
-            INSERT INTO Payments (user_id, amount, payment_status, payment_date)
-            VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(payments_log_query, (user_id, amount, payment_status, payment_date))
+    payments_log_query = """
+        INSERT INTO Payments (user_id, order_id, amount, payment_status, payment_date)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(payments_log_query, (user_id, order_id, amount, payment_status, payment_date))
 
     db.commit()
 
