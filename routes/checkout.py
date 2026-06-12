@@ -104,7 +104,7 @@ def voucher():
         if db:
             db.close()
 
-@checkout.route('/delivery', methods=['POST'])
+@checkout.route('/delivery', methods=['GET', 'POST'])
 def delivery():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
@@ -191,6 +191,15 @@ def payment_confirm():
             cursor.execute(points_update_query, (entered_voucher_code, user_id))
             db.commit()
 
+        # reward the user with 5 points for completing a payment
+        reward_bonus_query = """
+            UPDATE Users
+            SET reward_points = reward_points + 5
+            WHERE user_id = %s
+        """
+        cursor.execute(reward_bonus_query, (user_id,))
+        db.commit()
+
         order_insert_query = """
             INSERT INTO Orders (user_id, order_date, order_status, total_price)
             VALUES (%s, %s, %s, %s)
@@ -219,6 +228,9 @@ def payment_confirm():
         session['last_payment_amount'] = amount
         session.pop('discounted_total', None)
         session.pop('entered_voucher_code', None)
+        session.pop('order_id', None)
+        session.pop('basket', None)
+        session.pop('total', None)
 
         return jsonify({'success': True, 'redirect_url': url_for('checkout.payment_success')}), 200
     except Exception as e:
