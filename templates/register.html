@@ -1,61 +1,61 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
-</head>
-<body>
-    <h1>Register New Account</h1>
+{% extends "index.html" %}
 
-    <form action="/register" method="post">
-        
-        <h3>Personal Details</h3>
-        <label>First Name:</label><br>
-        <input type="text" name="first_name" required />
-        <br><br>
+{% block title %}Register{% endblock %}
+{% block register_active %}active{% endblock %}
 
-        <label>Last Name:</label><br>
-        <input type="text" name="last_name" required />
-        <br><br>
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="/register" method="post">
+                <h1>Create a new account</h1>
 
-        <label>Email Address:</label><br>
-        <input type="email" name="email" required />
-        <br><br>
+                <h3>Personal Details</h3>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" required />
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" required />
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required />
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" required />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required />
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required />
+                </div>
 
-        <label>Phone Number:</label><br>
-        <input type="tel" name="phone" required />
-        <br><br>
+                <h3>Address Details</h3>
+                <div class="form-group">
+                    <label>Address Line 1</label>
+                    <input type="text" name="address1" required />
+                </div>
+                <div class="form-group">
+                    <label>Address Line 2 (Optional)</label>
+                    <input type="text" name="address2" />
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" required />
+                </div>
+                <div class="form-group">
+                    <label>Postal Code</label>
+                    <input type="text" name="postal_code" required />
+                </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required />
-        <br><br>
-
-        <label>Confirm Password:</label><br>
-        <input type="password" name="confirm_password" required />
-        <br><br>
-
-        <hr>
-        <h3>Address Details</h3>
-
-        <label>Address Line 1:</label><br>
-        <input type="text" name="address1" required />
-        <br><br>
-
-        <label>Address Line 2 (Optional):</label><br>
-        <input type="text" name="address2" />
-        <br><br>
-
-        <label>City:</label><br>
-        <input type="text" name="city" required />
-        <br><br>
-
-        <label>Postal Code:</label><br>
-        <input type="text" name="postal_code" required />
-        <br><br>
-
-        <button type="submit">REGISTER</button>
-        <a href="/">Cancel</a>
-    </form>
-</body>
-</html>
+                <button type="submit" class="submit-btn">Register</button>
+                <p class="small-text">Already have an account? <a href="/login">Login here</a></p>
+            </form>
+        </div>
+    </section>
+{% endblock %}

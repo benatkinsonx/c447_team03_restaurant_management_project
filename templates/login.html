@@ -1,26 +1,27 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
-</head>
-<body>
-    <h1>Login to your account</h1>
+{% extends "index.html" %}
 
-    <form action="/login" method="post">
-        
-        <h3>Login</h3>
-        <label>email:</label><br>
-        <input type="email" name="email" required />
-        <br><br>
+{% block title %}Login{% endblock %}
+{% block login_active %}active{% endblock %}
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required />
-        <br><br>
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="/login" method="post">
+                <h1>Login to your account</h1>
 
-        <button type="submit">Login</button>
-        <a href="/">Cancel</a>
-    </form>
-</body>
-</html>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required />
+                </div>
+
+                <button type="submit" class="submit-btn">Login</button>
+                <p class="small-text">No account yet? <a href="/register">Register now</a></p>
+            </form>
+        </div>
+    </section>
+{% endblock %}

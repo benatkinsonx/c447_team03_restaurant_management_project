@@ -1,64 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Menu</title>
+{% extends "index.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Customer Menu</h1>
+{% block title %}Menu{% endblock %}
 
-    <a href="/basket"> view basket </a>
-    
-    <br>
-    {% if menu_items %}
-        <table border="1" cellpadding="8">
-            <tr>
-                <th>ID</th>
-                <th>Item</th>
-                <th>Category</th>
-                <th>Vegetarian</th>
-                <th>Price</th>
-                <th>Available</th>
-                <th>Add to basket</th>
-            </tr>
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <h1>Customer Menu</h1>
+            <div class="button-row">
+                <a href="/basket" class="button secondary">View Basket</a>
+            </div>
 
-            {% for item in menu_items %}
-            <tr>
-                <td>{{ item.menu_id }}</td>
-                <td>{{ item.item_name }}</td>
-                <td>{{ item.category }}</td>
-                <td>
-                    {% if item.is_veg %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                </td>
-                <td>£{{ item.price }}</td>
-                <td>
-                    {% if item.is_available %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                </td>
-                <td>
-                    <form action="/basket/add/{{ item.menu_id }}" method="post">
-                        <input type="number" name="quantity" value="1" min="1" required>
-                        <button type="submit">Add</button>
-                    </form> 
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p>No menu items available</p>
-    {% endif %}
+            {% if menu_items %}
+                <div class="table-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Vegetarian</th>
+                                <th>Price</th>
+                                <th>Available</th>
+                                <th>Add</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in menu_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ 'Yes' if item.is_veg else 'No' }}</td>
+                                    <td>£{{ item.price }}</td>
+                                    <td>{{ 'Yes' if item.is_available else 'No' }}</td>
+                                    <td>
+                                        <form action="/basket/add/{{ item.menu_id }}" method="post" class="inline-form">
+                                            <input type="number" name="quantity" value="1" min="1" required>
+                                            <button type="submit" class="submit-btn small-btn">Add</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No menu items available</p>
+            {% endif %}
 
-    <br>
-    <a href="/dashboard">Back to Dashboard</a>
-</body>
-</html>
+            <div class="button-row">
+                <a href="/dashboard" class="button secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
