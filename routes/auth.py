@@ -146,9 +146,6 @@ def login():
         session['first_name'] = user['first_name']
         session['role_id'] = user['role_id']
 
-<<<<<<< HEAD
-        # return render_template('dash.html')
-=======
         token = jwt.encode(
             {
                 "user_id": user['user_id'],
@@ -160,10 +157,8 @@ def login():
             algorithm=JWT_a
         )
 
-        session["JWT_token"] = token
+        session["jwt_token"] = token
 
-
->>>>>>> origin/main
         return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
