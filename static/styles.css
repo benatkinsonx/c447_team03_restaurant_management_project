@@ -328,3 +328,187 @@ a {
         font-size: 1rem;
     }
 }
+
+/* MENU */
+/* ADMIN MENU PAGE STYLES */
+.admin-menu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    margin-top: 90px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.admin-header h1 {
+    color: #333;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.basket-btn {
+    background: #66B1F1;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-block;
+}
+
+.basket-btn:hover {
+    background: #4a90d9;
+    transform: translateY(-2px);
+}
+
+.back-btn {
+    background: #666;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.back-btn:hover {
+    background: #555;
+    transform: translateY(-2px);
+}
+
+.menu-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.menu-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.menu-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.menu-table tr:hover {
+    background: #f9f9f9;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.add-btn {
+    background: #66B1F1;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 0.5rem;
+}
+
+.add-btn:hover {
+    background: #4a90d9;
+    transform: translateY(-1px);
+}
+
+.veg-badge {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.non-veg-badge {
+    background: #ff9800;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.available-badge {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.unavailable-badge {
+    background: #f44336;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.no-items {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 10px;
+    color: #666;
+}
+
+/* Responsive styles for admin menu */
+@media (max-width: 768px) {
+    .admin-menu-container {
+        padding: 1rem;
+        margin-top: 80px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .menu-table {
+        font-size: 0.8rem;
+    }
+
+    .menu-table th,
+    .menu-table td {
+        padding: 0.5rem;
+    }
+
+    .quantity-input {
+        width: 50px;
+    }
+
+    .add-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}
+

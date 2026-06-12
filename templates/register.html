@@ -3,59 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
+    <title>User Registration | Aura Restaurant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Register New Account</h1>
 
-    <form action="/register" method="post">
-        
-        <h3>Personal Details</h3>
-        <label>First Name:</label><br>
-        <input type="text" name="first_name" required />
-        <br><br>
+    <!-- Hero Section (same as booking and login) -->
+    <section class="et-slide" id="register">
+        <h1>Create Account</h1>
+        <h3>Join us for an unforgettable experience</h3>
+    </section>
 
-        <label>Last Name:</label><br>
-        <input type="text" name="last_name" required />
-        <br><br>
+    <!-- Registration Form (using same classes as booking form) -->
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="/register" method="post">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" required>
+                </div>
 
-        <label>Email Address:</label><br>
-        <input type="email" name="email" required />
-        <br><br>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" required>
+                </div>
 
-        <label>Phone Number:</label><br>
-        <input type="tel" name="phone" required />
-        <br><br>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required>
+                </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required />
-        <br><br>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" required>
+                </div>
 
-        <label>Confirm Password:</label><br>
-        <input type="password" name="confirm_password" required />
-        <br><br>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
 
-        <hr>
-        <h3>Address Details</h3>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required>
+                </div>
 
-        <label>Address Line 1:</label><br>
-        <input type="text" name="address1" required />
-        <br><br>
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #eee;">
 
-        <label>Address Line 2 (Optional):</label><br>
-        <input type="text" name="address2" />
-        <br><br>
+                <div class="form-group">
+                    <label>Address Line 1</label>
+                    <input type="text" name="address1" required>
+                </div>
 
-        <label>City:</label><br>
-        <input type="text" name="city" required />
-        <br><br>
+                <div class="form-group">
+                    <label>Address Line 2 (Optional)</label>
+                    <input type="text" name="address2">
+                </div>
 
-        <label>Postal Code:</label><br>
-        <input type="text" name="postal_code" required />
-        <br><br>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" name="city" required>
+                    </div>
 
-        <button type="submit">REGISTER</button>
-        <a href="/">Cancel</a>
-    </form>
+                    <div class="form-group">
+                        <label>Postal Code</label>
+                        <input type="text" name="postal_code" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Register →</button>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="/" style="color: #666; text-decoration: none; font-size: 0.9rem;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
 </body>
 </html>
