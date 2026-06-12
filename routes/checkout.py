@@ -1,4 +1,6 @@
 import datetime
+import os
+import stripe
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Blueprint
 import mysql.connector
@@ -8,6 +10,9 @@ from db import get_connection
 
 
 checkout = Blueprint("checkout", __name__)
+
+# configure stripe (set STRIPE_SECRET_KEY in environment)
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY', '')
 
 @checkout.route("/gotocheckout", methods=["POST"])
 def gotocheckout():
@@ -113,63 +118,119 @@ def delivery():
         if delivery_option == 'delivery':
             session['total'] += 5.00
     
-    return render_template('payment.html', total=session.get('discounted_total', session['total']))
+    # create Stripe PaymentIntent now and render payment page
+    total = session.get('discounted_total', session['total'])
+    amount_cents = int(round(float(total) * 100))
+    intent = stripe.PaymentIntent.create(
+        amount=amount_cents,
+        currency='gbp',
+        metadata={'integration_check': 'accept_a_payment'}
+    )
+
+    client_secret = intent.client_secret
+    publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+
+    return render_template('payment.html', client_secret=client_secret, publishable_key=publishable_key, total=total)
 
 @checkout.route('/payment', methods=['POST'])
 def payment():
+    """Create a Stripe PaymentIntent and render the payment page.
+
+    The front-end will confirm the payment and then POST to /payment/confirm
+    to allow the server to record the order and payment in the database.
+    """
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 
+    total = session.get('discounted_total', session['total'])
+    amount_cents = int(round(float(total) * 100))
+
+    # create payment intent (test mode when using test keys)
+    intent = stripe.PaymentIntent.create(
+        amount=amount_cents,
+        currency='gbp',
+        metadata={'integration_check': 'accept_a_payment'}
+    )
+
+    client_secret = intent.client_secret
+    publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+
+    return render_template('payment.html', client_secret=client_secret, publishable_key=publishable_key, total=total)
+
+
+@checkout.route('/payment/confirm', methods=['POST'])
+def payment_confirm():
+    data = request.get_json(silent=True) or {}
+    payment_intent_id = data.get('paymentIntentId')
+
+    if not payment_intent_id:
+        return jsonify({'error': 'missing paymentIntentId'}), 400
+
+    intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    if intent.status != 'succeeded':
+        return jsonify({'error': 'payment not successful', 'status': intent.status}), 400
+
+    # record order and payment
     db = get_connection()
     cursor = db.cursor(dictionary=True)
-
-    # only deduct reward points if a voucher was applied and stored in session
-    entered_voucher_code = session.get('entered_voucher_code')
-    if entered_voucher_code:
-        points_update_query = """
-            UPDATE Users
-            SET reward_points = reward_points - (
-                SELECT points
-                FROM Rewards
-                WHERE reward_name = %s
-            )
-            WHERE user_id = %s
-        """
+    try:
         user_id = session['user_id']
-        cursor.execute(points_update_query, (entered_voucher_code, user_id))
+
+        # deduct reward points if voucher applied
+        entered_voucher_code = session.get('entered_voucher_code')
+        if entered_voucher_code:
+            points_update_query = """
+                UPDATE Users
+                SET reward_points = reward_points - (
+                    SELECT points
+                    FROM Rewards
+                    WHERE reward_name = %s
+                )
+                WHERE user_id = %s
+            """
+            cursor.execute(points_update_query, (entered_voucher_code, user_id))
+            db.commit()
+
+        order_insert_query = """
+            INSERT INTO Orders (user_id, order_date, order_status, total_price)
+            VALUES (%s, %s, %s, %s)
+        """
+        order_date = datetime.datetime.now()
+        order_status = 'completed'
+        total_price = session.get('discounted_total', session['total'])
+
+        cursor.execute(order_insert_query, (user_id, order_date, order_status, total_price))
+        db.commit()
+        order_id = cursor.lastrowid
+        session['order_id'] = order_id
+
+        payments_log_query = """
+            INSERT INTO Payments (user_id, order_id, amount, payment_status, payment_date)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        amount = total_price
+        payment_status = 'completed'
+        payment_date = datetime.datetime.now()
+
+        cursor.execute(payments_log_query, (user_id, order_id, amount, payment_status, payment_date))
         db.commit()
 
-    # ======================================
-    # orders table
-    # ======================================
-    order_insert_query = """
-        INSERT INTO Orders (user_id, order_date, order_status, total_price)
-        VALUES (%s, %s, %s, %s)
-    """
-    user_id = session['user_id']
-    order_date = datetime.datetime.now()
-    order_status = 'completed'
-    total_price = session.get('discounted_total', session['total'])
+        # store amount for the success page and clear temporary session keys
+        session['last_payment_amount'] = amount
+        session.pop('discounted_total', None)
+        session.pop('entered_voucher_code', None)
 
-    cursor.execute(order_insert_query, (user_id, order_date, order_status, total_price))
-    db.commit()
-    session['order_id'] = cursor.lastrowid
+        return jsonify({'success': True, 'redirect_url': url_for('checkout.payment_success')}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        db.close()
 
-    # ======================================
-    # payments logging
-    # ======================================
 
-    order_id = session['order_id']
-    amount = session.get('discounted_total', session['total'])
-    payment_status = 'completed'
-    payment_date = datetime.datetime.now()
-
-    payments_log_query = """
-        INSERT INTO Payments (user_id, order_id, amount, payment_status, payment_date)
-        VALUES (%s, %s, %s, %s, %s)
-    """
-    cursor.execute(payments_log_query, (user_id, order_id, amount, payment_status, payment_date))
-
-    db.commit()
-
+@checkout.route('/payment_success')
+def payment_success():
+    # show the payment success page using the stored amount
+    amount = session.pop('last_payment_amount', None)
     return render_template('payment_success.html', amount=amount)

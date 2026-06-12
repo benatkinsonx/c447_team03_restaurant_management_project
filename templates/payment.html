@@ -5,40 +5,63 @@
 {% block content %}
     <section class="booking-form">
         <div class="form-container">
-            <form action="/payment" method="post">
-                <h2>3. Payment Details</h2>
+            <h2>3. Payment Details</h2>
 
+            <div class="form-group">
+                <label>Total</label>
+                <p>£{{ "%.2f"|format(total) }}</p>
+            </div>
+
+            <form id="payment-form">
                 <div class="form-group">
-                    <label>Total</label>
-                    <p>£{{ "%.2f"|format(total) }}</p>
+                    <label>Card</label>
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert" class="message"></div>
                 </div>
 
-                <input type="hidden" name="total" value="{{ total }}">
-
-                <div class="form-group">
-                    <label>Card Number</label>
-                    <input
-                        type="text"
-                        name="card_number"
-                        placeholder="1234 5678 9012 3456"
-                        pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>CVV</label>
-                    <input
-                        type="text"
-                        name="cvv"
-                        placeholder="123"
-                        pattern="[0-9]{3}"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="submit-btn">Pay</button>
+                <button id="submit" class="submit-btn">Pay</button>
             </form>
         </div>
     </section>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe("{{ publishable_key }}");
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        card.mount('#card-element');
+
+        const form = document.getElementById('payment-form');
+        const submit = document.getElementById('submit');
+        const cardErrors = document.getElementById('card-errors');
+
+        form.addEventListener('submit', function(ev) {
+            ev.preventDefault();
+            submit.disabled = true;
+            stripe.confirmCardPayment("{{ client_secret }}", {
+                payment_method: { card: card }
+            }).then(function(result) {
+                if (result.error) {
+                    cardErrors.textContent = result.error.message;
+                    submit.disabled = false;
+                } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+                    // notify server to record order/payment
+                    fetch('/payment/confirm', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id })
+                    }).then(r => r.json()).then(data => {
+                        if (data.success) {
+                            window.location = data.redirect_url || '/dashboard';
+                        } else {
+                            cardErrors.textContent = data.error || 'Server error';
+                            submit.disabled = false;
+                        }
+                    }).catch(err => {
+                        cardErrors.textContent = err.toString();
+                        submit.disabled = false;
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock %}
