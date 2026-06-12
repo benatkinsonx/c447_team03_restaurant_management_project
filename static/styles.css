@@ -312,23 +312,28 @@ a {
     background: #4a90d9;
 }
 
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .et-hero-tab {
         font-size: 0.7rem;
     }
-    
+
     .et-hero-tabs h1,
     .et-slide h1 {
         font-size: 1.5rem;
         letter-spacing: 0.5rem;
     }
-    
+
     .slide-caption h2 {
         font-size: 1rem;
     }
+}
 
-    .reservation-table-container {
+
+/* RESERVATION TABLE */
+
+.reservation-table-container {
     width: 100%;
     overflow-x: auto;
     margin-top: 30px;
@@ -339,6 +344,8 @@ a {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .reservation-table th,
@@ -346,14 +353,16 @@ a {
     padding: 14px;
     border-bottom: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle;
 }
 
 .reservation-table th {
+    background-color: #f4f4f4;
     font-weight: bold;
 }
 
 .reservation-table tr:hover {
-    background-color: #f5f5f5;
+    background-color: #f7f7f7;
 }
 
 .reservation-table form {
@@ -361,11 +370,20 @@ a {
 }
 
 .reservation-table button {
+    background: #66B1F1;
+    color: white;
+    border: none;
     padding: 8px 14px;
+    border-radius: 20px;
     cursor: pointer;
 }
 
-/* menu page */
+.reservation-table button:hover {
+    background: #4a90d9;
+}
+
+
+/* ADMIN AND CUSTOMER MENU PAGES */
 
 .menu-page {
     padding: 60px 20px;
@@ -403,6 +421,9 @@ a {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
 .menu-table th,
@@ -414,8 +435,8 @@ a {
 }
 
 .menu-table th {
-    font-weight: bold;
     background-color: #f4f4f4;
+    font-weight: bold;
 }
 
 .menu-table tr:hover {
@@ -429,23 +450,68 @@ a {
 .menu-table input[type="number"] {
     width: 65px;
     padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
-.menu-button {
+.menu-button,
+.menu-button-danger {
     display: inline-block;
     padding: 9px 15px;
     border: none;
+    border-radius: 20px;
     cursor: pointer;
     text-decoration: none;
+    color: white;
+}
+
+.menu-button {
+    background-color: #66B1F1;
+}
+
+.menu-button:hover {
+    background-color: #4a90d9;
 }
 
 .menu-button-danger {
-    padding: 9px 15px;
-    border: none;
-    cursor: pointer;
+    background-color: #d9534f;
+}
+
+.menu-button-danger:hover {
+    background-color: #c9302c;
 }
 
 .menu-empty {
     text-align: center;
     padding: 30px;
+}
+
+
+/* MOBILE TABLE ADJUSTMENTS */
+
+@media (max-width: 768px) {
+    .menu-page {
+        padding: 30px 10px;
+    }
+
+    .menu-container {
+        width: 100%;
+    }
+
+    .menu-table th,
+    .menu-table td,
+    .reservation-table th,
+    .reservation-table td {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .menu-actions {
+        flex-direction: column;
+    }
+
+    .menu-actions a,
+    .menu-actions button {
+        width: 100%;
+    }
 }   
