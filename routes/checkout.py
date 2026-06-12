@@ -172,8 +172,4 @@ def payment():
 
     db.commit()
 
-    return f"""
-            <h1>Payment Successful!</h1>
-            <p>The order has been placed successfully.</p>
-            <a href="/dashboard">Go to Dashboard</a>
-        """
+    return render_template('payment_success.html', amount=amount)

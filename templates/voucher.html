@@ -1,24 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voucher</title>
+{% extends "index.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <form action="/voucher" method="post">
-        <h2>1. Voucher Code (Optional)</h2><br><br>
-        <h4>You have {{ curr_reward_points }} reward points</h4><br><br>
-        <input type="text" name="voucher_code" placeholder="Enter voucher code"><br><br>
+{% block title %}Voucher{% endblock %}
 
-        <h4>{{ message|safe }}</h4>
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="/voucher" method="post">
+                <h2>1. Voucher Code (Optional)</h2>
+                <div class="form-group">
+                    <label>You have {{ curr_reward_points }} reward points</label>
+                    <input type="text" name="voucher_code" placeholder="Enter voucher code">
+                </div>
 
-        <p>Total: £{{ "%.2f"|format(total) }}</p>
+                <div class="form-group">
+                    <p class="message">{{ message|safe }}</p>
+                </div>
 
-        <button type="submit">Next</button>
-    </form>
+                <div class="form-group">
+                    <label>Total</label>
+                    <p>£{{ "%.2f"|format(total) }}</p>
+                </div>
 
-</body>
-</html>
+                <button type="submit" class="submit-btn">Next</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}
