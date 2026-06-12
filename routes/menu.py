@@ -252,3 +252,39 @@ def view_basket():
             cursor.close()
         if db:
             db.close()
+
+@menu_bp.route("/admin/menu/delete/<int:menu_id>", methods=["POST"])
+def delete_menu_item(menu_id):
+    db = None
+    cursor = None
+
+    try:
+        db = get_connection()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            UPDATE MenuItems
+            SET is_available = FALSE
+            WHERE menu_id = %s
+        """, (menu_id,))
+
+        db.commit()
+
+        return redirect(url_for("menu.admin_menu"))
+
+    except mysql.connector.Error as err:
+        if db:
+            db.rollback()
+
+        return f"""
+            <h3>Database Error</h3>
+            <p>{err}</p>
+            <a href="/admin/menu">Go Back</a>
+        """, 500
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if db:
+            db.close()
