@@ -1,17 +1,25 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Blueprint
-import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
-from db import get_connection
-import jwt
-from datetime import datetime, timedelta, timezone
+import os
 import re
+from datetime import datetime, timedelta, timezone
+
+import jwt
+import mysql.connector
+from dotenv import load_dotenv
+from flask import Blueprint, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from db import get_connection
+
+load_dotenv()
 
 
 auth = Blueprint("auth", __name__)
 
-# testing purpise only move to env after
-JWT_s = "test"
-JWT_a = "HS256"
+JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET is missing from the .env file")
 
 def validate_password(password):
     if not password:
@@ -111,8 +119,8 @@ def register():
                 "role_id": 1,
                 "exp": datetime.now(timezone.utc) + timedelta(hours=2)
             },
-            JWT_s,
-            algorithm=JWT_a
+            JWT_SECRET,
+            algorithm=JWT_ALGORITHM
         )
 
         session["jwt_token"] = token
