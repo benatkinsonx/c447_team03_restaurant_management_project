@@ -173,6 +173,17 @@ def add_to_basket(menu_id):
         return redirect(url_for("auth.login"))
     
     quantity = int(request.form.get("quantity", 1))
+
+    try:
+        quantity = int(request.form.get("quantity", "1"))
+    except ValueError:
+        quantity = 0
+
+    if quantity < 1 or quantity > 50:
+        return """
+        <h3>Invalid quantity.</h3>
+        <a href="/customer/menu">Go Back</a>
+        """
     
     basket = session.get("basket", {})
 
@@ -289,3 +300,17 @@ def delete_menu_item(menu_id):
 
         if db:
             db.close()
+
+
+@menu_bp.route("/basket/remove/<int:menu_id>", methods=["POST"])
+def remove_from_basket(menu_id):
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    basket = session.get("basket", {})
+    basket.pop(str(menu_id), None)
+
+    session["basket"] = basket
+    session.modified = True
+
+    return redirect(url_for("menu.view_basket"))
