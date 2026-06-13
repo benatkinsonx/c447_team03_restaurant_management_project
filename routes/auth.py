@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_connection
 import jwt
 from datetime import datetime, timedelta, timezone
+import re
 
 
 auth = Blueprint("auth", __name__)
@@ -12,6 +13,29 @@ auth = Blueprint("auth", __name__)
 JWT_s = "test"
 JWT_a = "HS256"
 
+def validate_password(password):
+    if not password:
+        return "Password is required."
+
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one uppercase letter."
+
+    if not re.search(r"[a-z]", password):
+        return "Password must contain at least one lowercase letter."
+
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return "Password must contain at least one special character."
+
+    if re.search(r"\s", password):
+        return "Password must not contain spaces."
+
+    return None
 
 @auth.route('/register', methods=['GET'])
 def show_register_form():
@@ -39,6 +63,15 @@ def register():
 
         if password != confirm_password:
             return "<h3>Error: Passwords do not match!</h3><a href='/register'>Go Back</a>", 400
+        
+        password_error = validate_password(password)
+
+        if password_error:
+            return f"""
+                <h3>Invalid Password</h3>
+                <p>{password_error}</p>
+                <a href="/register">Go Back</a>
+            """
 
         # Secure and encrypt the user password
         password_hash = generate_password_hash(password)
@@ -88,9 +121,7 @@ def register():
 
         db.commit()
         
-        return """<h1>Registration Complete!</h1>
-        <p>The account has been created successfully.</p><a href='/'>go back home to log in</a>
-        """
+        return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         # If any single query errors out, rollback the database to prevent incomplete data states
