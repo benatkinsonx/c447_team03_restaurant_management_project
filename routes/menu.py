@@ -234,6 +234,7 @@ def view_basket():
                 "subtotal": subtotal
             })
 
+        session['total'] = total
         return render_template(
             "basket.html",
             basket_items=basket_items,

@@ -1,108 +1,54 @@
-
-
 {% extends "index.html" %}
 
 {% block title %}Menu{% endblock %}
 
 {% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <h1>Customer Menu</h1>
+            <div class="button-row">
+                <a href="/basket" class="button secondary">View Basket</a>
+            </div>
 
-<section class="et-slide">
-    <h1>Restaurant Menu</h1>
-    <h3>Choose your favourite food and merchandise</h3>
-</section>
-
-<section class="menu-page">
-    <div class="menu-container">
-
-        <div class="menu-actions">
-            <a href="{{ url_for('menu.view_basket') }}">
-                <button type="button" class="menu-button">
-                    View Basket
-                </button>
-            </a>
-
-            <a href="{{ url_for('dashboard.dashboard') }}">
-                <button type="button" class="menu-button">
-                    Back to Dashboard
-                </button>
-            </a>
-        </div>
-
-        {% if menu_items %}
-
-            <div class="menu-table-container">
-                <table class="menu-table">
-
-                    <thead>
-                        <tr>
-                            <!-- <th>ID</th> -->
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th>Vegetarian</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Add</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for item in menu_items %}
+            {% if menu_items %}
+                <div class="table-container">
+                    <table class="styled-table">
+                        <thead>
                             <tr>
-                                <!-- <td>{{ item.menu_id }}</td> -->
-                                <td>{{ item.item_name }}</td>
-                                <td>{{ item.category }}</td>
-                                <td>{{ item.category_desc }}</td>
-
-                                <td>
-                                    {% if item.is_veg %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-
-                                <td>£{{ "%.2f"|format(item.price) }}</td>
-
-                                <form
-                                    action="{{ url_for(
-                                        'menu.add_to_basket',
-                                        menu_id=item.menu_id
-                                    ) }}"
-                                    method="POST"
-                                >
-                                    <td>
-                                        <input
-                                            type="number"
-                                            name="quantity"
-                                            value="1"
-                                            min="1"
-                                            required
-                                        >
-                                    </td>
-
-                                    <td>
-                                        <button type="submit" class="menu-button">
-                                            Add
-                                        </button>
-                                    </td>
-                                </form>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Vegetarian</th>
+                                <th>Price</th>
+                                <th>Available</th>
+                                <th>Add</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            {% for item in menu_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ 'Yes' if item.is_veg else 'No' }}</td>
+                                    <td>£{{ item.price }}</td>
+                                    <td>{{ 'Yes' if item.is_available else 'No' }}</td>
+                                    <td>
+                                        <form action="/basket/add/{{ item.menu_id }}" method="post" class="inline-form">
+                                            <input type="number" name="quantity" value="1" min="1" required>
+                                            <button type="submit" class="submit-btn small-btn">Add</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No menu items available</p>
+            {% endif %}
 
-                </table>
+            <div class="button-row">
+                <a href="/dashboard" class="button secondary">Back to Dashboard</a>
             </div>
-
-        {% else %}
-
-            <div class="menu-empty">
-                <h3>No menu items are currently available.</h3>
-            </div>
-
-        {% endif %}
-
-    </div>
-</section>
-
+        </div>
+    </section>
 {% endblock %}

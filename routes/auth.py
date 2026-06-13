@@ -157,8 +157,7 @@ def login():
             algorithm=JWT_a
         )
 
-        session["JWT_token"] = token
-
+        session["jwt_token"] = token
 
         return redirect(url_for("dashboard.dashboard"))
 

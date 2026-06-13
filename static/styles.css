@@ -290,10 +290,10 @@ a {
     border-radius: 5px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+.message {
+    color: #333;
+    font-size: 0.95rem;
+    min-height: 1.5rem;
 }
 
 .submit-btn {
@@ -308,21 +308,94 @@ a {
     margin-top: 1rem;
 }
 
+    .submit-btn.small-btn {
+        width: auto;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+    }
+
 .submit-btn:hover {
     background: #4a90d9;
 }
 
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .et-hero-tab {
-        font-size: 0.7rem;
+    .submit-btn:hover {
+        background: #4a90d9;
     }
 
-    .et-hero-tabs h1,
-    .et-slide h1 {
-        font-size: 1.5rem;
-        letter-spacing: 0.5rem;
+    .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.85rem 1.5rem;
+        border-radius: 50px;
+        background: #66B1F1;
+        color: white;
+        text-decoration: none;
+        border: none;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .button.secondary {
+        background: #f3f4f6;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .button:hover,
+    .button.secondary:hover {
+        background: #4a90d9;
+        color: #fff;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 0.9rem 1rem;
+        border: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .styled-table thead {
+        background: #f3f4f6;
+    }
+
+    .styled-table tbody tr:nth-child(even) {
+        background: #fcfcfc;
+    }
+
+    .inline-form {
+        display: inline-flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .total-label {
+        margin-top: 1.5rem;
+        font-size: 1.3rem;
+    }
+
+    .small-text {
+        margin-top: 1rem;
+        color: #666;
+        font-size: 0.95rem;
     }
 
     .slide-caption h2 {
