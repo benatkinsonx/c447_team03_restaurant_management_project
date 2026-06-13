@@ -17,11 +17,12 @@
                 <a href="/basket" class="button secondary">View Basket</a>
             </div>
             <div class="button-row">
-                <a href="/payment_history" class="button">Payment History</a>
+                <a href="/manage_bookings" class="button">Manage Reservation</a>
                 <a href="/bookings" class="button secondary">Make a Reservation</a>
             </div>
             <div class="button-row">
-                <a href="/manage_bookings" class="button">Manage Reservation</a>
+                <a href="/payment_history" class="button">Payment History</a>
+                <a href="/logout" class="button">Logout</a>
             </div>
 
             {% if session["role_id"] == 2 or session["role_id"] == 3 %}

@@ -58,7 +58,7 @@ def register():
         # get personal data 
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        email = request.form.get('email')
+        email = request.form.get('email').strip().lower()
         phone_num = request.form.get('phone')         
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
@@ -109,6 +109,7 @@ def register():
         session["email"] = email
         session["first_name"] = first_name
         session["role_id"] = 1
+        db.commit()
 
         # Create JWT token
         token = jwt.encode(
@@ -127,7 +128,6 @@ def register():
 
 
 
-        db.commit()
         
         return redirect(url_for("dashboard.dashboard"))
 
@@ -192,8 +192,8 @@ def login():
                 "role_id": user["role_id"],
                 "exp": datetime.now(timezone.utc) + timedelta(hours=2)
             },
-            JWT_s,
-            algorithm=JWT_a
+            JWT_SECRET,
+            algorithm=JWT_ALGORITHM
         )
 
         session["jwt_token"] = token

@@ -1,11 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Blueprint
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_connection
+from datetime import date
 
-from flask import request, render_template, redirect, url_for, session
-import mysql.connector
-from db import get_connection
 
 booking_bp = Blueprint("bookings", __name__)
 
@@ -15,18 +12,14 @@ def bookings():
     if "user_id" not in session:
         return redirect(url_for("auth.login", next=request.path))
 
-    return render_template("bookings.html")
+    return render_template("bookings.html", today=date.today().isoformat())
 
 
 @booking_bp.route("/submitbooking", methods=["POST"])
 def submit_booking():
     if "user_id" not in session:
-        return redirect(url_for("auth.login", next=url_for("bookings")))
+        return redirect(url_for("auth.login", next=url_for("bookings.bookings")))
 
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
-    email = request.form.get("email")
-    phone = request.form.get("phone")
     booking_date = request.form.get("date")
     booking_time = request.form.get("time")
     guests = request.form.get("guests")
@@ -230,6 +223,23 @@ def edit_booking(reservation_id):
                 <a href="/manage_bookings">Go Back</a>
             """, 400
 
+        
+        cursor.execute("""
+            SELECT reservation_id
+            FROM Reservations
+            WHERE user_id = %s
+            AND booking_date = %s
+            AND booking_time = %s
+            AND reservation_id != %s
+            AND status != 'cancelled'
+            LIMIT 1
+        """, (
+            session["user_id"],
+            booking_date,
+            booking_time,
+            reservation_id
+        ))
+
         cursor.execute("""
             UPDATE Reservations
             SET
@@ -247,11 +257,6 @@ def edit_booking(reservation_id):
             session["user_id"]
         ))
 
-        if cursor.rowcount == 0:
-            return """
-                <h3>Reservation could not be updated.</h3>
-                <a href="/manage_bookings">Go Back</a>
-            """, 404
 
         db.commit()
 
