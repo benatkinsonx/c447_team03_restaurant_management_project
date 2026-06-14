@@ -1,22 +1,24 @@
 from flask import Blueprint, session, redirect, render_template, url_for, request
 import mysql.connector
 from db import get_connection
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 menu_bp = Blueprint("menu", __name__)
 
 
 def is_admin_owner():
-    return "role_id" in session and session.get("role_id") in [2, 3]
+    claims = get_jwt()
+    return claims.get("role_id") in [2, 3]
 
 
 @menu_bp.route("/admin/menu", methods=["GET"])
+@jwt_required()
 def admin_menu():
-    # Uncomment this later when admin login works properly
-    # if not is_admin_owner():
-    #     return """
-    #         <p>Not admin</p>
-    #         <a href="/customer/menu">View customer menu</a>
-    #     """, 403
+    if not is_admin_owner():
+        return """
+            <p>Not admin</p>
+            <a href="/customer/menu">View customer menu</a>
+        """, 403
 
     db = None
     cursor = None
@@ -100,7 +102,13 @@ def customer_menu():
 
 
 @menu_bp.route("/admin/menu/change/<int:menu_id>", methods=["GET", "POST"])
+@jwt_required()
 def change_menu_item(menu_id):
+    if not is_admin_owner():
+        return """
+            <p>Not admin</p>
+            <a href="/customer/menu">View customer menu</a>
+        """, 403
     db = None
     cursor = None
 
@@ -168,9 +176,8 @@ def change_menu_item(menu_id):
             db.close()
 
 @menu_bp.route("/basket/add/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def add_to_basket(menu_id):
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
     
     quantity = int(request.form.get("quantity", 1))
 
@@ -202,9 +209,8 @@ def add_to_basket(menu_id):
     return redirect(url_for('menu.customer_menu'))
 
 @menu_bp.route("/basket", methods=["GET"])
+@jwt_required()
 def view_basket():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
 
     basket = session.get("basket", {})
 

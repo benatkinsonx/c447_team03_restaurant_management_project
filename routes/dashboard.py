@@ -1,23 +1,39 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from db import get_connection
+from flask_jwt_extended import  get_jwt, get_jwt_identity, jwt_required 
 
 dashboard_route = Blueprint("dashboard", __name__)
 
 
 @dashboard_route.route("/dashboard")
-def dashboard():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+@jwt_required()
+# def dashboard():
+#     if "user_id" not in session:
+#         return redirect(url_for("auth.login"))
 
-    return render_template("dash.html")
+#     return render_template("dash.html")
+
+def dashboard(): 
+    claims = get_jwt() 
+    
+    current_user = { 
+                    "user_id": int(get_jwt_identity()), 
+                    "email": claims.get("email"), 
+                    "first_name": claims.get("first_name"), 
+                    "role_id": claims.get("role_id") 
+                    } 
+    
+    return render_template( "dash.html", current_user=current_user )
 
 
 @dashboard_route.route("/payment_history")
+@jwt_required()
 def payment_history():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("auth.login"))
 
-    user_id = session['user_id']
+    # user_id = session['user_id']
+    user_id = int(get_jwt_identity())
     db = None
     cursor = None
 

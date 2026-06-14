@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_connection
-
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
 checkout = Blueprint("checkout", __name__)
@@ -15,13 +15,12 @@ checkout = Blueprint("checkout", __name__)
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY', '')
 
 @checkout.route("/gotocheckout", methods=["POST"])
+@jwt_required()
 def gotocheckout():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+    user_id = int(get_jwt_identity())
     
     total = session['total']
 
-    user_id = session['user_id']
     points_query = """
         SELECT reward_points
         FROM Users
@@ -34,9 +33,9 @@ def gotocheckout():
     return render_template('voucher.html', total=total, curr_reward_points=f"{user_points['reward_points']}", message="")
 
 @checkout.route('/voucher', methods=['POST'])
+@jwt_required()
 def voucher():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+    user_id = int(get_jwt_identity())
     
     try:
         db = get_connection()
@@ -55,7 +54,6 @@ def voucher():
         voucher = cursor.fetchone()
 
         # ===== user points handling =====
-        user_id = session['user_id']
         points_query = """
             SELECT reward_points
             FROM Users
@@ -105,9 +103,8 @@ def voucher():
             db.close()
 
 @checkout.route('/delivery', methods=['GET', 'POST'])
+@jwt_required()
 def delivery():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
     
     delivery_option = request.form.get('delivery')
     
@@ -133,14 +130,8 @@ def delivery():
     return render_template('payment.html', client_secret=client_secret, publishable_key=publishable_key, total=total)
 
 @checkout.route('/payment', methods=['POST'])
+@jwt_required()
 def payment():
-    """Create a Stripe PaymentIntent and render the payment page.
-
-    The front-end will confirm the payment and then POST to /payment/confirm
-    to allow the server to record the order and payment in the database.
-    """
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
 
     total = session.get('discounted_total', session['total'])
     amount_cents = int(round(float(total) * 100))
@@ -159,7 +150,10 @@ def payment():
 
 
 @checkout.route('/payment/confirm', methods=['POST'])
+@jwt_required()
 def payment_confirm():
+    user_id = int(get_jwt_identity())
+    
     data = request.get_json(silent=True) or {}
     payment_intent_id = data.get('paymentIntentId')
 
@@ -174,8 +168,6 @@ def payment_confirm():
     db = get_connection()
     cursor = db.cursor(dictionary=True)
     try:
-        user_id = session['user_id']
-
         # deduct reward points if voucher applied
         entered_voucher_code = session.get('entered_voucher_code')
         if entered_voucher_code:

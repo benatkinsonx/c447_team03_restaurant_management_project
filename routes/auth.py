@@ -2,6 +2,8 @@ import os
 import re
 from datetime import datetime, timedelta, timezone
 
+from flask_jwt_extended import  create_access_token, set_access_cookies, unset_jwt_cookies 
+
 import jwt
 import mysql.connector
 from dotenv import load_dotenv
@@ -10,16 +12,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from db import get_connection
 
-load_dotenv()
-
-
 auth = Blueprint("auth", __name__)
-
-JWT_SECRET = os.getenv("JWT_SECRET")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-
-if not JWT_SECRET:
-    raise RuntimeError("JWT_SECRET is missing from the .env file")
 
 def validate_password(password):
     if not password:
@@ -44,6 +37,12 @@ def validate_password(password):
         return "Password must not contain spaces."
 
     return None
+
+def get_next_page(): 
+    next_page = ( request.form.get("next") or request.args.get("next") ) 
+    if ( next_page and next_page.startswith("/") and not next_page.startswith("//") ): 
+        return next_page 
+    return url_for("dashboard.dashboard")
 
 @auth.route('/register', methods=['GET'])
 def show_register_form():
@@ -104,32 +103,50 @@ def register():
         cursor.execute(user_sql, user_val)
 
         user_id = cursor.lastrowid
-
-        session["user_id"] = user_id
-        session["email"] = email
-        session["first_name"] = first_name
-        session["role_id"] = 1
+        
         db.commit()
-
-        # Create JWT token
-        token = jwt.encode(
-            {
-                "user_id": user_id,
+        session.clear()
+        
+        access_token = create_access_token(
+            identity=str(user_id),
+            additional_claims={
                 "email": email,
                 "first_name": first_name,
-                "role_id": 1,
-                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
-            },
-            JWT_SECRET,
-            algorithm=JWT_ALGORITHM
+                "role_id": 1
+            }
         )
+        
+        response = redirect(url_for('dashboard.dashboard'))
+        
+        set_access_cookies(response, access_token)
+        
+        return response
 
-        session["jwt_token"] = token
+        # session["user_id"] = user_id
+        # session["email"] = email
+        # session["first_name"] = first_name
+        # session["role_id"] = 1
+        # db.commit()
+
+        # # Create JWT token
+        # token = jwt.encode(
+        #     {
+        #         "user_id": user_id,
+        #         "email": email,
+        #         "first_name": first_name,
+        #         "role_id": 1,
+        #         "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+        #     },
+        #     JWT_SECRET,
+        #     algorithm=JWT_ALGORITHM
+        # )
+
+        # session["jwt_token"] = token
 
 
 
         
-        return redirect(url_for("dashboard.dashboard"))
+        # return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         # If any single query errors out, rollback the database to prevent incomplete data states
@@ -179,26 +196,44 @@ def login():
                 <h3>Invalid email or password.</h3>
                 <a href="/login">Try Again</a>
             """
+            
 
-        session['user_id'] = user['user_id']
-        session['email'] = user['email']
-        session['first_name'] = user['first_name']
-        session['role_id'] = user['role_id']
-
-        token = jwt.encode(
-            {
-                "user_id": user['user_id'],
-                "email": user["email"],
-                "role_id": user["role_id"],
-                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
-            },
-            JWT_SECRET,
-            algorithm=JWT_ALGORITHM
+        session.clear()
+        
+        access_token = create_access_token(
+            identity=str(user["user_id"]),
+            additional_claims={
+                "email": email,
+                "first_name": user["first_name"],
+                "role_id": user["role_id"]
+            }
         )
+        
+        response = redirect(url_for('dashboard.dashboard'))
+        
+        set_access_cookies(response, access_token)
+        
+        return response
 
-        session["jwt_token"] = token
+        # session['user_id'] = user['user_id']
+        # session['email'] = user['email']
+        # session['first_name'] = user['first_name']
+        # session['role_id'] = user['role_id']
 
-        return redirect(url_for("dashboard.dashboard"))
+        # token = jwt.encode(
+        #     {
+        #         "user_id": user['user_id'],
+        #         "email": user["email"],
+        #         "role_id": user["role_id"],
+        #         "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+        #     },
+        #     JWT_SECRET,
+        #     algorithm=JWT_ALGORITHM
+        # )
+
+        # session["jwt_token"] = token
+
+        # return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         return f"""
@@ -218,5 +253,10 @@ def login():
 @auth.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('home'))
+    
+    response = redirect(url_for('home'))
+    
+    unset_jwt_cookies(response)
+    
+    return response
     
