@@ -30,15 +30,15 @@ app.config["JWT_SECRET_KEY"] = jwt_secret
 # read from cookies
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
+    minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "120"))
+)
 app.config["JWT_COOKIE_SECURE"] = (
     os.getenv("JWT_COOKIE_SECURE", "false").lower() == "true"
 )
 
 app.config["JWT_COOKIE_SAMESITE"] = "Lax"
 
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
-    minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "120"))
-)
 
 # Enable JWT CSRF protection for HTML forms 
 app.config["JWT_COOKIE_CSRF_PROTECT"] = True 

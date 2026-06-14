@@ -222,7 +222,11 @@ def payment_confirm():
     if not payment_intent_id:
         return jsonify({"error": "missing paymentIntentId"}), 400
 
-    intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    try:
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    except Exception as err:
+        return jsonify({"error": f"Could not retrieve payment intent: {err}"}), 500
+
     if intent.status != "succeeded":
         return (
             jsonify({"error": "payment not successful", "status": intent.status}),

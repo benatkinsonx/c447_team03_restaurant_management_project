@@ -50,6 +50,8 @@
             }
         });
 
+        const csrfToken = "{{ csrf_token }}";
+
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
             submit.disabled = true;
