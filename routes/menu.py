@@ -142,7 +142,8 @@ def change_menu_item(menu_id):
             return render_template(
                 "change_menu.html",
                 item=item,
-                categories=categories
+                categories=categories,
+                csrf_token=get_jwt()["csrf"]
             )
 
         item_name = request.form.get("item_name")
@@ -319,13 +320,10 @@ def delete_menu_item(menu_id):
 
 @menu_bp.route("/basket/remove/<int:menu_id>", methods=["POST"])
 def remove_from_basket(menu_id):
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
-
     basket = session.get("basket", {})
     basket.pop(str(menu_id), None)
 
     session["basket"] = basket
     session.modified = True
 
-    return redirect(url_for("menu.view_basket"))
+    return redirect(url_for("menu.view_basket")), 303

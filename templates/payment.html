@@ -49,6 +49,8 @@
             }
         });
 
+        const csrfToken = "{{ csrf_token }}";
+
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
             submit.disabled = true;
@@ -62,8 +64,12 @@
                     // notify server to record order/payment
                     fetch('/payment/confirm', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id })
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id, csrf_token: csrfToken })
                     }).then(r => r.json()).then(data => {
                         if (data.success) {
                             window.location = data.redirect_url || '/dashboard';

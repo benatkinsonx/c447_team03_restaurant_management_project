@@ -45,8 +45,10 @@
         </select>
         <br><br>
 
-        <button type="submit">SAVE</button>
-        <a href="/admin/menu">Cancel</a>
+        <form action="/admin/menu/change/{{ item.menu_id }}" methods=["post", "get"] class="inline-form">
+            <button type="submit" class="submit-btn">Next</button>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
+        </form>
     </form>
 </body>
 
