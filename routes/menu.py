@@ -8,7 +8,12 @@ menu_bp = Blueprint("menu", __name__)
 
 def is_admin_owner():
     claims = get_jwt()
-    return claims.get("role_id") in [2, 3]
+    raw = claims.get("role_id")
+    try:
+        role = int(raw) if raw is not None else None
+    except (TypeError, ValueError):
+        role = None
+    return role in [2, 3, 4]
 
 
 @menu_bp.route("/admin/menu", methods=["GET"])
@@ -43,7 +48,11 @@ def admin_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("admin_menu.html", menu_items=menu_items)
+        return render_template(
+            "admin_menu.html",
+            menu_items=menu_items,
+            csrf_token=get_jwt()["csrf"]
+        ), 200
 
     except mysql.connector.Error as err:
         return f"""
@@ -60,6 +69,7 @@ def admin_menu():
 
 
 @menu_bp.route("/customer/menu", methods=["GET"])
+@jwt_required()
 def customer_menu():
     db = None
     cursor = None
@@ -85,7 +95,7 @@ def customer_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("customer_menu.html", menu_items=menu_items)
+        return render_template("customer_menu.html", menu_items=menu_items, csrf_token=get_jwt()["csrf"]), 200
 
     except mysql.connector.Error as err:
         return f"""
@@ -136,8 +146,9 @@ def change_menu_item(menu_id):
             return render_template(
                 "change_menu.html",
                 item=item,
-                categories=categories
-            )
+                categories=categories,
+                csrf_token=get_jwt()["csrf"]
+            ), 200
 
         item_name = request.form.get("item_name")
         cat_id = request.form.get("cat_id")
@@ -157,7 +168,7 @@ def change_menu_item(menu_id):
 
         db.commit()
 
-        return redirect(url_for("menu.admin_menu"))
+        return redirect(url_for("menu.admin_menu")), 303
 
     except mysql.connector.Error as err:
         if db:
@@ -179,6 +190,8 @@ def change_menu_item(menu_id):
 @jwt_required()
 def add_to_basket(menu_id):
     
+    user_id = int(get_jwt_identity())
+    
     quantity = int(request.form.get("quantity", 1))
 
     try:
@@ -190,7 +203,7 @@ def add_to_basket(menu_id):
         return """
         <h3>Invalid quantity.</h3>
         <a href="/customer/menu">Go Back</a>
-        """
+        """, 400
     
     basket = session.get("basket", {})
 
@@ -206,7 +219,7 @@ def add_to_basket(menu_id):
     session["basket"] = basket
     session.modified = True
 
-    return redirect(url_for('menu.customer_menu'))
+    return redirect(url_for('menu.customer_menu')), 303
 
 @menu_bp.route("/basket", methods=["GET"])
 @jwt_required()
@@ -215,7 +228,7 @@ def view_basket():
     basket = session.get("basket", {})
 
     if not basket:
-        return render_template("basket.html", basket_items=[], total=0)
+        return render_template("basket.html", basket_items=[], total=0), 200
 
     db = None
     cursor = None
@@ -255,8 +268,9 @@ def view_basket():
         return render_template(
             "basket.html",
             basket_items=basket_items,
-            total=total
-        )
+            total=total,
+            csrf_token=get_jwt()["csrf"]
+        ), 200
 
     except mysql.connector.Error as err:
         return f"""
@@ -272,6 +286,7 @@ def view_basket():
             db.close()
 
 @menu_bp.route("/admin/menu/delete/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def delete_menu_item(menu_id):
     db = None
     cursor = None
@@ -288,7 +303,7 @@ def delete_menu_item(menu_id):
 
         db.commit()
 
-        return redirect(url_for("menu.admin_menu"))
+        return redirect(url_for("menu.admin_menu")), 303
 
     except mysql.connector.Error as err:
         if db:
@@ -311,7 +326,7 @@ def delete_menu_item(menu_id):
 @menu_bp.route("/basket/remove/<int:menu_id>", methods=["POST"])
 def remove_from_basket(menu_id):
     if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login")), 302
 
     basket = session.get("basket", {})
     basket.pop(str(menu_id), None)
@@ -319,4 +334,5 @@ def remove_from_basket(menu_id):
     session["basket"] = basket
     session.modified = True
 
-    return redirect(url_for("menu.view_basket"))
+    return redirect(url_for("menu.view_basket")), 303
+

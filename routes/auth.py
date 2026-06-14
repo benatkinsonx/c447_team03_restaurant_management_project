@@ -46,7 +46,7 @@ def get_next_page():
 
 @auth.route('/register', methods=['GET'])
 def show_register_form():
-    return render_template('register.html')
+    return render_template('register.html'), 200
 
 @auth.route('/register', methods=['POST'])
 def register():
@@ -78,7 +78,7 @@ def register():
                 <h3>Invalid Password</h3>
                 <p>{password_error}</p>
                 <a href="/register">Go Back</a>
-            """
+            """, 400
 
         # Secure and encrypt the user password
         password_hash = generate_password_hash(password)
@@ -120,6 +120,7 @@ def register():
         
         set_access_cookies(response, access_token)
         
+        response.status_code = 303
         return response
 
         # session["user_id"] = user_id
@@ -153,7 +154,7 @@ def register():
         db.rollback() 
         return f"""<h3>Database Error!</h3>
             <p>Details: {err}</p>
-            <a href='/register'>Try Again</a>"""
+            <a href='/register'>Try Again</a>""", 500
 
     finally:
         cursor.close()
@@ -164,7 +165,7 @@ def register():
 def login():
 
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login.html'), 200
 
     db = None
     cursor = None
@@ -189,13 +190,13 @@ def login():
             return """
                 <h3>Invalid email or password.</h3>
                 <a href="/login">Try Again</a>
-            """
+            """, 401
 
         if not check_password_hash(user['password_hash'], password):
             return """
                 <h3>Invalid email or password.</h3>
                 <a href="/login">Try Again</a>
-            """
+            """, 401
             
 
         session.clear()
@@ -213,6 +214,7 @@ def login():
         
         set_access_cookies(response, access_token)
         
+        response.status_code = 303
         return response
 
         # session['user_id'] = user['user_id']
@@ -240,7 +242,7 @@ def login():
             <h3>Database Error!</h3>
             <p>{err}</p>
             <a href="/login">Try Again</a>
-        """
+        """, 500
 
     finally:
         if cursor:
@@ -258,5 +260,6 @@ def logout():
     
     unset_jwt_cookies(response)
     
+    response.status_code = 302
     return response
     

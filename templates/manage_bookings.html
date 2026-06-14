@@ -77,7 +77,7 @@
                     </table>
                 </div>
             {% else %}
-                <!-- No Reservations Message -->
+
                 <div style="text-align: center; margin: 2rem 0;">
                     <h3 style="color: #666; margin-bottom: 1rem;">You currently have no reservations.</h3>
                     <a href="{{ url_for('bookings.bookings') }}">
@@ -86,7 +86,6 @@
                 </div>
             {% endif %}
 
-            <!-- Back to Dashboard Button -->
             <div class="form-group" style="margin-top: 1.5rem;">
                 <a href="{{ url_for('dashboard.dashboard') }}" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem; border-radius: 50px; display: block; text-align: center; font-weight: 600;">← Back to Dashboard</a>
             </div>

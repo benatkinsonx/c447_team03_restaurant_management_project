@@ -105,6 +105,7 @@
         <div class="button-row">
             <a href="/customer/menu" class="button secondary">Back to menu</a>
             <form action="/gotocheckout" method="post" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
                 <button type="submit" class="submit-btn">Proceed to Checkout</button>
             </form>
         </div>

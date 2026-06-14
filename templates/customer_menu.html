@@ -58,6 +58,7 @@
                                         {% if item.is_available %}
                                             <form action="{{ url_for('menu.add_to_basket', menu_id=item.menu_id) }}" method="post" style="display: flex; gap: 0.5rem; align-items: center;">
                                                 <input type="number" name="quantity" value="1" min="1" max="50" style="width: 70px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; text-align: center;">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
                                                 <button type="submit" style="background: #66B1F1; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 5px; cursor: pointer; transition: all 0.3s; font-weight: 600;">Add</button>
                                         {% else %}
                                             <span style="color: #999; font-style: italic;">Not available</span>
