@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,4 +61,119 @@
     <br>
     <a href="/dashboard">Back to Dashboard</a>
 </body>
-</html>
+</html> -->
+
+{% extends "index.html" %}
+
+{% block title %}Admin Menu{% endblock %}
+
+{% block content %}
+
+<section class="et-slide">
+    <h1>Admin Menu</h1>
+    <h3>Manage restaurant menu items</h3>
+</section>
+
+<section class="menu-page">
+    <div class="menu-container">
+
+        <div class="menu-actions">
+            <a href="{{ url_for('dashboard.dashboard') }}">
+                <button type="button" class="menu-button">
+                    Back to Dashboard
+                </button>
+            </a>
+        </div>
+
+        {% if menu_items %}
+
+            <div class="menu-table-container">
+                <table class="menu-table">
+
+                    <thead>
+                        <tr>
+                            <!-- <th>ID</th> -->
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Vegetarian</th>
+                            <th>Price</th>
+                            <th>Available</th>
+                            <th>Change</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in menu_items %}
+                            <tr>
+                                <!-- <td>{{ item.menu_id }}</td> -->
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.category }}</td>
+                                <td>{{ item.category_desc }}</td>
+
+                                <td>
+                                    {% if item.is_veg %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+
+                                <td>£{{ "%.2f"|format(item.price) }}</td>
+
+                                <td>
+                                    {% if item.is_available %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for(
+                                        'menu.change_menu_item',
+                                        menu_id=item.menu_id
+                                    ) }}">
+                                        <button type="button" class="menu-button">
+                                            Change
+                                        </button>
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <form
+                                        action="{{ url_for(
+                                            'menu.delete_menu_item',
+                                            menu_id=item.menu_id
+                                        ) }}"
+                                        method="POST"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="menu-button-danger"
+                                            onclick="return confirm('Delete this menu item?');"
+                                        >
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="menu-empty">
+                <h3>No menu items available.</h3>
+            </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

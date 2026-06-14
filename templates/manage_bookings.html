@@ -1,0 +1,150 @@
+{% extends "index.html" %}
+
+{% block title %}Manage Reservations{% endblock %}
+
+{% block book_active %}active{% endblock %}
+
+{% block content %}
+
+<section class="et-slide" id="manage-bookings">
+    <h1>Manage Reservations</h1>
+    <h3>View, amend or cancel your reservations</h3>
+</section>
+
+<section class="booking-form">
+    <div class="form-container">
+
+    <a href="{{ url_for('bookings.bookings') }}">
+        <button type="button" class="submit-btn">
+            Make Another Reservation
+        </button>
+    </a>
+
+    {% if reservations %}
+
+        <div class="reservation-table-container">
+            <table class="reservation-table">
+
+                <thead>
+                    <tr>
+                        <th>Reservation ID</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Table</th>
+                        <th>Status</th>
+                        <th>Amend</th>
+                        <th>Cancel</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for reservation in reservations %}
+
+                        <tr>
+                            <td>
+                                {{ reservation.reservation_id }}
+                            </td>
+
+                            <td>
+                                {{ reservation.booking_date }}
+                            </td>
+
+                            <td>
+                                {{ reservation.booking_time }}
+                            </td>
+
+                            <td>
+                                {{ reservation.size }}
+                            </td>
+
+                            <td>
+                                {% if reservation.table_num %}
+                                    Table {{ reservation.table_num }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ reservation.status|title }}
+                            </td>
+
+                            <td>
+                                {% if reservation.status != "cancelled" %}
+
+                                    <a href="{{ url_for(
+                                        'bookings.edit_booking',
+                                        reservation_id=reservation.reservation_id
+                                    ) }}">
+                                        <button type="button">
+                                            Amend
+                                        </button>
+                                    </a>
+
+                                {% else %}
+
+                                    Not available
+
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if reservation.status != "cancelled" %}
+
+                                    <form
+                                        action="{{ url_for(
+                                            'bookings.cancel_booking',
+                                            reservation_id=reservation.reservation_id
+                                        ) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to cancel this reservation?');"
+                                    >
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
+                                        <button type="submit">
+                                            Cancel
+                                        </button>
+                                    </form>
+
+                                {% else %}
+
+                                    Already cancelled
+
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    {% else %}
+
+        <div class="form-group">
+            <h3>You currently have no reservations.</h3>
+
+            <a href="{{ url_for('bookings.bookings') }}">
+                <button type="button" class="submit-btn">
+                    Make a Reservation
+                </button>
+            </a>
+        </div>
+
+    {% endif %}
+
+    <div class="form-group">
+        <a href="{{ url_for('dashboard.dashboard') }}">
+            <button type="button">
+                Back to Dashboard
+            </button>
+        </a>
+    </div>
+
+</div>
+```
+
+</section>
+
+{% endblock %}

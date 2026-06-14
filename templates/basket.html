@@ -3,50 +3,58 @@
 {% block title %}Basket{% endblock %}
 
 {% block content %}
-    <section class="booking-form">
-        <div class="form-container">
-            <h1>Basket</h1>
+<section class="booking-form">
+    <div class="form-container">
+        <h1>Basket</h1>
 
-            {% if basket_items %}
-                <div class="table-container">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Subtotal</th>
-                                <th>Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in basket_items %}
-                                <tr>
-                                    <td>{{ item.item_name }}</td>
-                                    <td>£{{ item.price }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td>£{{ "%.2f"|format(item.subtotal) }}</td>
-                                    <td>
-                                        <a href="/basket/remove/{{ item.menu_id}}" class="button secondary">Remove</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="total-label">Total: £{{ "%.2f"|format(total) }}</h3>
-
-                <div class="button-row">
-                    <a href="/customer/menu" class="button secondary">Back to menu</a>
-                    <form action="/gotocheckout" method="post" class="inline-form">
-                        <button type="submit" class="submit-btn">Proceed to Checkout</button>
-                    </form>
-                </div>
-            {% else %}
-                <p>Your basket is empty.</p>
-                <a href="/customer/menu" class="button secondary">View Menu</a>
-            {% endif %}
+        {% if basket_items %}
+        <div class="table-container">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in basket_items %}
+                    <tr>
+                        <td>{{ item.item_name }}</td>
+                        <td>£{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>£{{ "%.2f"|format(item.subtotal) }}</td>
+                        <td>
+                            <form action="{{ url_for(
+                                                'menu.remove_from_basket',
+                                                menu_id=item.menu_id
+                                            ) }}" method="POST">
+                                <button type="submit" class="menu-button-danger">
+                                    Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </section>
+
+        <h3 class="total-label">Total: £{{ "%.2f"|format(total) }}</h3>
+
+        <div class="button-row">
+            <a href="/customer/menu" class="button secondary">Back to menu</a>
+            <form action="/gotocheckout" method="post" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
+                <button type="submit" class="submit-btn">Proceed to Checkout</button>
+            </form>
+        </div>
+        {% else %}
+        <p>Your basket is empty.</p>
+        <a href="/customer/menu" class="button secondary">View Menu</a>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

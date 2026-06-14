@@ -1,0 +1,42 @@
+
+{% extends "index.html" %}
+
+{% block title %}Edit Reservation{% endblock %}
+
+{% block book_active %}active{% endblock %}
+
+{% block content %}
+    <section class="et-slide" id="edit-booking">
+        <h1>Edit Reservation</h1>
+        <h3>Change the date, time, or number of guests for your reservation</h3>
+    </section>
+
+    <section class="booking-form">
+        <div class="form-container">
+            <form action="{{ url_for('bookings.edit_booking', reservation_id=reservation.reservation_id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="form-group">
+                    <label for="date">Booking date</label>
+                    <input type="date" id="date" name="date" value="{{ reservation.booking_date }}" min="{{ today }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Booking time</label>
+                    <input type="time" id="time" name="time" value="{{ reservation.booking_time }}" min="09:00" max="17:30" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="guests">Number of guests</label>
+                    <input type="number" id="guests" name="guests" value="{{ reservation.size }}" min="1" max="20" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Save Changes</button>
+                    <a href="{{ url_for('bookings.manage_bookings') }}" class="menu-button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}
+

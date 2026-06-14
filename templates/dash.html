@@ -7,8 +7,8 @@
     <section class="booking-form">
         <div class="form-container">
             <h1>Dashboard</h1>
-            <p class="message">Welcome, {{ session["first_name"] }}</p>
-            <p>Email: {{ session["email"] }}</p>
+            <p class="message">Welcome, {{ current_user["first_name"] }}</p>
+            <p>Email: {{ current_user["email"] }}</p>
 
             <hr>
             <h3>Customer Options</h3>
@@ -17,14 +17,15 @@
                 <a href="/basket" class="button secondary">View Basket</a>
             </div>
             <div class="button-row">
-                <a href="/payment_history" class="button">Payment History</a>
+                <a href="/manage_bookings" class="button">Manage Reservation</a>
                 <a href="/bookings" class="button secondary">Make a Reservation</a>
             </div>
             <div class="button-row">
-                <a href="/manage_bookings" class="button">Manage Reservation</a>
+                <a href="/payment_history" class="button">Payment History</a>
+                <a href="/logout" class="button">Logout</a>
             </div>
 
-            {% if session["role_id"] == 2 or session["role_id"] == 3 %}
+            {% if current_user["role_id"] == 2 or current_user["role_id"] == 3 %}
                 <hr>
                 <h3>Admin / Owner Options</h3>
                 <div class="button-row">

@@ -1,22 +1,29 @@
 from flask import Blueprint, session, redirect, render_template, url_for, request
 import mysql.connector
 from db import get_connection
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 menu_bp = Blueprint("menu", __name__)
 
 
 def is_admin_owner():
-    return "role_id" in session and session.get("role_id") in [2, 3]
+    claims = get_jwt()
+    raw = claims.get("role_id")
+    try:
+        role = int(raw) if raw is not None else None
+    except (TypeError, ValueError):
+        role = None
+    return role in [2, 3, 4]
 
 
 @menu_bp.route("/admin/menu", methods=["GET"])
+@jwt_required()
 def admin_menu():
-    # Uncomment this later when admin login works properly
-    # if not is_admin_owner():
-    #     return """
-    #         <p>Not admin</p>
-    #         <a href="/customer/menu">View customer menu</a>
-    #     """, 403
+    if not is_admin_owner():
+        return """
+            <p>Not admin</p>
+            <a href="/customer/menu">View customer menu</a>
+        """, 403
 
     db = None
     cursor = None
@@ -58,6 +65,7 @@ def admin_menu():
 
 
 @menu_bp.route("/customer/menu", methods=["GET"])
+@jwt_required()
 def customer_menu():
     db = None
     cursor = None
@@ -83,7 +91,7 @@ def customer_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("customer_menu.html", menu_items=menu_items)
+        return render_template("customer_menu.html", menu_items=menu_items, csrf_token=get_jwt()["csrf"])
 
     except mysql.connector.Error as err:
         return f"""
@@ -100,7 +108,13 @@ def customer_menu():
 
 
 @menu_bp.route("/admin/menu/change/<int:menu_id>", methods=["GET", "POST"])
+@jwt_required()
 def change_menu_item(menu_id):
+    if not is_admin_owner():
+        return """
+            <p>Not admin</p>
+            <a href="/customer/menu">View customer menu</a>
+        """, 403
     db = None
     cursor = None
 
@@ -168,11 +182,23 @@ def change_menu_item(menu_id):
             db.close()
 
 @menu_bp.route("/basket/add/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def add_to_basket(menu_id):
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+    
+    user_id = int(get_jwt_identity())
     
     quantity = int(request.form.get("quantity", 1))
+
+    try:
+        quantity = int(request.form.get("quantity", "1"))
+    except ValueError:
+        quantity = 0
+
+    if quantity < 1 or quantity > 50:
+        return """
+        <h3>Invalid quantity.</h3>
+        <a href="/customer/menu">Go Back</a>
+        """
     
     basket = session.get("basket", {})
 
@@ -191,9 +217,8 @@ def add_to_basket(menu_id):
     return redirect(url_for('menu.customer_menu'))
 
 @menu_bp.route("/basket", methods=["GET"])
+@jwt_required()
 def view_basket():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
 
     basket = session.get("basket", {})
 
@@ -238,7 +263,8 @@ def view_basket():
         return render_template(
             "basket.html",
             basket_items=basket_items,
-            total=total
+            total=total,
+            csrf_token=get_jwt()["csrf"]
         )
 
     except mysql.connector.Error as err:
@@ -253,3 +279,53 @@ def view_basket():
             cursor.close()
         if db:
             db.close()
+
+@menu_bp.route("/admin/menu/delete/<int:menu_id>", methods=["POST"])
+def delete_menu_item(menu_id):
+    db = None
+    cursor = None
+
+    try:
+        db = get_connection()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            UPDATE MenuItems
+            SET is_available = FALSE
+            WHERE menu_id = %s
+        """, (menu_id,))
+
+        db.commit()
+
+        return redirect(url_for("menu.admin_menu"))
+
+    except mysql.connector.Error as err:
+        if db:
+            db.rollback()
+
+        return f"""
+            <h3>Database Error</h3>
+            <p>{err}</p>
+            <a href="/admin/menu">Go Back</a>
+        """, 500
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if db:
+            db.close()
+
+
+@menu_bp.route("/basket/remove/<int:menu_id>", methods=["POST"])
+def remove_from_basket(menu_id):
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    basket = session.get("basket", {})
+    basket.pop(str(menu_id), None)
+
+    session["basket"] = basket
+    session.modified = True
+
+    return redirect(url_for("menu.view_basket"))

@@ -314,86 +314,275 @@ a {
         font-size: 0.95rem;
     }
 
-    .submit-btn:hover {
-        background: #4a90d9;
+.submit-btn:hover {
+    background: #4a90d9;
+}
+
+   
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    border-radius: 50px;
+    background: #66B1F1;
+    color: white;
+    text-decoration: none;
+    border: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.button.secondary {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.button:hover,
+.button.secondary:hover {
+    background: #4a90d9;
+    color: #fff;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 0.9rem 1rem;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.styled-table thead {
+    background: #f3f4f6;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background: #fcfcfc;
+}
+
+.inline-form {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.total-label {
+    margin-top: 1.5rem;
+    font-size: 1.3rem;
+}
+
+.small-text {
+    margin-top: 1rem;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.slide-caption h2 {
+    font-size: 1rem;
+}
+
+
+
+/* RESERVATION TABLE */
+
+.reservation-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.reservation-table th,
+.reservation-table td {
+    padding: 14px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.reservation-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.reservation-table tr:hover {
+    background-color: #f7f7f7;
+}
+
+.reservation-table form {
+    margin: 0;
+}
+
+.reservation-table button {
+    background: #66B1F1;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.reservation-table button:hover {
+    background: #4a90d9;
+}
+
+
+/* ADMIN AND CUSTOMER MENU PAGES */
+
+.menu-page {
+    padding: 60px 20px;
+}
+
+.menu-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.menu-header h1 {
+    margin-bottom: 10px;
+}
+
+.menu-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.menu-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.menu-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.menu-table th,
+.menu-table td {
+    padding: 14px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.menu-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.menu-table tr:hover {
+    background-color: #f7f7f7;
+}
+
+.menu-table form {
+    margin: 0;
+}
+
+.menu-table input[type="number"] {
+    width: 65px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.menu-button,
+.menu-button-danger {
+    display: inline-block;
+    padding: 9px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.menu-button {
+    background-color: #66B1F1;
+}
+
+.menu-button:hover {
+    background-color: #4a90d9;
+}
+
+.menu-button-danger {
+    background-color: #d9534f;
+}
+
+.menu-button-danger:hover {
+    background-color: #c9302c;
+}
+
+.menu-empty {
+    text-align: center;
+    padding: 30px;
+}
+
+
+/* MOBILE TABLE ADJUSTMENTS */
+
+@media (max-width: 768px) {
+    .menu-page {
+        padding: 30px 10px;
     }
 
-    .button-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-
-    .button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0.85rem 1.5rem;
-        border-radius: 50px;
-        background: #66B1F1;
-        color: white;
-        text-decoration: none;
-        border: none;
-        font-weight: 600;
-        transition: background 0.3s ease;
-    }
-
-    .button.secondary {
-        background: #f3f4f6;
-        color: #333;
-        border: 1px solid #ddd;
-    }
-
-    .button:hover,
-    .button.secondary:hover {
-        background: #4a90d9;
-        color: #fff;
-    }
-
-    .table-container {
-        overflow-x: auto;
-        margin-top: 1rem;
-    }
-
-    .styled-table {
+    .menu-container {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
     }
 
-    .styled-table th,
-    .styled-table td {
-        padding: 0.9rem 1rem;
-        border: 1px solid #e5e7eb;
-        text-align: left;
+    .menu-table th,
+    .menu-table td,
+    .reservation-table th,
+    .reservation-table td {
+        padding: 10px;
+        font-size: 0.8rem;
     }
 
-    .styled-table thead {
-        background: #f3f4f6;
+    .menu-actions {
+        flex-direction: column;
     }
 
-    .styled-table tbody tr:nth-child(even) {
-        background: #fcfcfc;
+    .menu-actions a,
+    .menu-actions button {
+        width: 100%;
     }
-
-    .inline-form {
-        display: inline-flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    .total-label {
-        margin-top: 1.5rem;
-        font-size: 1.3rem;
-    }
-
-    .small-text {
-        margin-top: 1rem;
-        color: #666;
-        font-size: 0.95rem;
-    }
-    
-    .slide-caption h2 {
-        font-size: 1rem;
-    }
+}   
