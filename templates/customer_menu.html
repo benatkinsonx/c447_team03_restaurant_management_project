@@ -1,55 +1,66 @@
-{% extends "index.html" %}
+{% extends "index.html" %} {% block title %}Menu{% endblock %} {% block content
+%}
+<section class="booking-form">
+  <div class="form-container">
+    <h1>Customer Menu</h1>
+    <div class="button-row">
+      <a href="/basket" class="button secondary">View Basket</a>
+    </div>
 
-{% block title %}Menu{% endblock %}
+    {% if menu_items %}
+    <div class="table-container">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Vegetarian</th>
+            <th>Price</th>
+            <th>Available</th>
+            <th>Add</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in menu_items %}
+          <tr>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ 'Yes' if item.is_veg else 'No' }}</td>
+            <td>£{{ item.price }}</td>
+            <td>{{ 'Yes' if item.is_available else 'No' }}</td>
+            <td>
+              <form
+                action="/basket/add/{{ item.menu_id }}"
+                method="post"
+                class="inline-form"
+              >
+                <input
+                  type="number"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  required
+                />
+                <input
+                  type="hidden"
+                  name="csrf_token"
+                  value="{{ csrf_token }}"
+                />
+                <button type="submit" class="submit-btn small-btn">Add</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p>No menu items available</p>
+    {% endif %}
 
-{% block content %}
-    <section class="booking-form">
-        <div class="form-container">
-            <h1>Customer Menu</h1>
-            <div class="button-row">
-                <a href="/basket" class="button secondary">View Basket</a>
-            </div>
-
-            {% if menu_items %}
-                <div class="table-container">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Category</th>
-                                <th>Vegetarian</th>
-                                <th>Price</th>
-                                <th>Available</th>
-                                <th>Add</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in menu_items %}
-                                <tr>
-                                    <td>{{ item.item_name }}</td>
-                                    <td>{{ item.category }}</td>
-                                    <td>{{ 'Yes' if item.is_veg else 'No' }}</td>
-                                    <td>£{{ item.price }}</td>
-                                    <td>{{ 'Yes' if item.is_available else 'No' }}</td>
-                                    <td>
-                                        <form action="/basket/add/{{ item.menu_id }}" method="post" class="inline-form">
-                                            <input type="number" name="quantity" value="1" min="1" required>
-                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
-                                            <button type="submit" class="submit-btn small-btn">Add</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p>No menu items available</p>
-            {% endif %}
-
-            <div class="button-row">
-                <a href="/dashboard" class="button secondary">Back to Dashboard</a>
-            </div>
-        </div>
-    </section>
+    <div class="button-row">
+      <a href="/dashboard" class="button secondary">Back to Dashboard</a>
+    </div>
+  </div>
+</section>
 {% endblock %}
