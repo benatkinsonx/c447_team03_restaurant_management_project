@@ -45,7 +45,7 @@ def gotocheckout():
         curr_reward_points=f"{user_points['reward_points']}",
         message="",
         csrf_token=get_jwt()["csrf"],
-    )
+    ), 200
 
 
 @checkout.route("/voucher", methods=["POST"])
@@ -87,7 +87,7 @@ def voucher():
                 total=session["total"],
                 curr_reward_points=f"{user_points['reward_points']}",
                 message="", csrf_token=get_jwt()["csrf"]
-            )
+            ), 200
 
         # validate voucher exists
         if voucher:
@@ -104,7 +104,7 @@ def voucher():
                     "delivery.html",
                     total=session["discounted_total"],
                     message=f"Voucher '{voucher['reward_name']}' applied successfully! £{session['total']:.2f} reduced to £{session['discounted_total']:.2f}.<br><br>Reward points before: {user_points['reward_points']}<br>Reward points now: {user_points['reward_points'] - voucher['points']}.", csrf_token=get_jwt()["csrf"]
-                )
+                ), 200
             # user doesn't have enough points
             elif (
                 voucher.get("reward_name") == entered_voucher_code
@@ -117,7 +117,7 @@ def voucher():
                     total=session["total"],
                     curr_reward_points=f"{user_points['reward_points']}",
                     message=f"Not enough reward points for voucher '{voucher['reward_name']}'. You have {user_points['reward_points']} points but the voucher requires {voucher['points']} points. Try again or proceed without a voucher.", csrf_token=get_jwt()["csrf"]
-                )
+                ), 400
             else:
                 session.pop("discounted_total", None)
                 session.pop("entered_voucher_code", None)
@@ -126,7 +126,7 @@ def voucher():
                     total=session["total"],
                     curr_reward_points=f"{user_points['reward_points']}",
                     message="Invalid voucher code. Try again or proceed without a voucher.", csrf_token=get_jwt()["csrf"]
-                )
+                ), 400
         else:
             # no matching voucher found
             session.pop("discounted_total", None)
@@ -136,14 +136,14 @@ def voucher():
                 total=session["total"],
                 curr_reward_points=f"{user_points['reward_points']}",
                 message="Invalid voucher code. Try again or proceed without a voucher.", csrf_token=get_jwt()["csrf"]
-            )
+            ), 400
 
     except mysql.connector.Error as err:
         return f"""
             <h3>Database Error!</h3>
             <p>{err}</p>
             <a href="/login">Try Again</a>
-        """
+        """, 500
     finally:
         if cursor:
             cursor.close()
@@ -182,7 +182,7 @@ def delivery():
         publishable_key=publishable_key,
         total=total,
         csrf_token=get_jwt()["csrf"]
-    )
+    ), 200
 
 
 @checkout.route("/payment", methods=["POST"])
@@ -208,7 +208,7 @@ def payment():
         publishable_key=publishable_key,
         total=total,
         csrf_token=get_jwt()["csrf"]
-    )
+    ), 200
 
 
 @checkout.route("/payment/confirm", methods=["POST"])
@@ -316,4 +316,4 @@ def payment_confirm():
 def payment_success():
     # show the payment success page using the stored amount
     amount = session.pop("last_payment_amount", None)
-    return render_template("payment_success.html", amount=amount)
+    return render_template("payment_success.html", amount=amount), 200

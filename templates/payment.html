@@ -12,7 +12,7 @@
                 <p>£{{ "%.2f"|format(total) }}</p>
             </div>
 
-            <form id="payment-form">
+            <form id="payment-form" action="/payment" method="post">
                 <div class="form-group">
                     <label>Card</label>
                     <div id="card-element"></div>
@@ -20,6 +20,7 @@
                 </div>
 
                 <button id="submit" class="submit-btn">Pay</button>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             </form>
         </div>
     </section>
@@ -64,13 +65,20 @@
                     // notify server to record order/payment
                     fetch('/payment/confirm', {
                         method: 'POST',
-                        credentials: 'include',
+                        credentials: 'same-origin',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
+                            'X-CSRF-TOKEN': '{{ csrf_token }}'
                         },
-                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id, csrf_token: csrfToken })
-                    }).then(r => r.json()).then(data => {
+                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id })
+                    }).then(async r => {
+                        const text = await r.text();
+                        try {
+                            return JSON.parse(text);
+                        } catch (parseError) {
+                            throw new Error(text || 'Invalid JSON response');
+                        }
+                    }).then(data => {
                         if (data.success) {
                             window.location = data.redirect_url || '/dashboard';
                         } else {

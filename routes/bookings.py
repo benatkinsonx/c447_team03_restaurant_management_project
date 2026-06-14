@@ -11,19 +11,14 @@ booking_bp = Blueprint("bookings", __name__)
 @booking_bp.route("/bookings", methods=["GET"])
 @jwt_required()
 def bookings():
-    # if "user_id" not in session:
-    #     return redirect(url_for("auth.login", next=request.path))
-
-    # return render_template("bookings.html", today=date.today().isoformat())
-    return render_template( "bookings.html", today=date.today().isoformat(), csrf_token=get_jwt()["csrf"] )
+    return render_template( "bookings.html", 
+                           today=date.today().isoformat(), 
+                           csrf_token=get_jwt()["csrf"] ), 200
 
 
 @booking_bp.route("/submitbooking", methods=["POST"])
 @jwt_required()
-def submit_booking():
-    # if "user_id" not in session:
-    #     return redirect(url_for("auth.login", next=url_for("bookings.bookings")))
-    
+def submit_booking(): 
     user_id = int(get_jwt_identity())
 
     booking_date = request.form.get("date")
@@ -70,7 +65,7 @@ def submit_booking():
                 <a href="/bookings">Choose Another Time</a>
                 <br>
                 <a href="/manage_bookings">Manage Reservations</a>
-            """
+            """, 409
 
         cursor.execute("""
             INSERT INTO Reservations
@@ -86,7 +81,7 @@ def submit_booking():
 
         db.commit()
 
-        return redirect(url_for("bookings.manage_bookings"))
+        return redirect(url_for("bookings.manage_bookings")), 303
 
     except mysql.connector.Error as err:
         if db:
@@ -145,7 +140,7 @@ def manage_bookings():
 
         reservations = cursor.fetchall()
 
-        return render_template( "manage_bookings.html", reservations=reservations, csrf_token=get_jwt()["csrf"] )
+        return render_template( "manage_bookings.html", reservations=reservations, csrf_token=get_jwt()["csrf"] ), 200
 
     except mysql.connector.Error as err:
         return f"""
@@ -201,10 +196,10 @@ def edit_booking(reservation_id):
             reservation = cursor.fetchone()
 
             if reservation is None:
-                return """
-                    <h3>Reservation not found.</h3>
-                    <a href="/manage_bookings">Go Back</a>
-                """, 404
+                    return """
+                        <h3>Reservation not found.</h3>
+                        <a href="/manage_bookings">Go Back</a>
+                    """, 404
 
             if reservation["status"] == "cancelled":
                 return """
@@ -217,7 +212,7 @@ def edit_booking(reservation_id):
                 reservation=reservation,
                 today=date.today().isoformat(),
                 csrf_token=get_jwt()["csrf"]
-            )
+            ), 200
 
         booking_date = request.form.get("date")
         booking_time = request.form.get("time")
@@ -290,7 +285,7 @@ def edit_booking(reservation_id):
 
         return redirect(
             url_for("bookings.manage_bookings")
-        )
+        ), 303
 
     except mysql.connector.Error as err:
         if db:
@@ -345,7 +340,7 @@ def cancel_booking(reservation_id):
 
         return redirect(
             url_for("bookings.manage_bookings")
-        )
+        ), 303
 
     except mysql.connector.Error as err:
         if db:

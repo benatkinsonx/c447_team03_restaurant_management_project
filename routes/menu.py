@@ -20,10 +20,13 @@ def is_admin_owner():
 @jwt_required()
 def admin_menu():
     if not is_admin_owner():
-        return """
+        return (
+            """
             <p>Not admin</p>
             <a href="/customer/menu">View customer menu</a>
-        """, 403
+        """,
+            403,
+        )
 
     db = None
     cursor = None
@@ -48,14 +51,22 @@ def admin_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("admin_menu.html", menu_items=menu_items)
+        return (
+            render_template(
+                "admin_menu.html", menu_items=menu_items, csrf_token=get_jwt()["csrf"]
+            ),
+            200,
+        )
 
     except mysql.connector.Error as err:
-        return f"""
+        return (
+            f"""
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/dashboard">Go Back</a>
-        """, 500
+        """,
+            500,
+        )
 
     finally:
         if cursor:
@@ -91,14 +102,24 @@ def customer_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("customer_menu.html", menu_items=menu_items, csrf_token=get_jwt()["csrf"])
+        return (
+            render_template(
+                "customer_menu.html",
+                menu_items=menu_items,
+                csrf_token=get_jwt()["csrf"],
+            ),
+            200,
+        )
 
     except mysql.connector.Error as err:
-        return f"""
+        return (
+            f"""
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/dashboard">Go Back</a>
-        """, 500
+        """,
+            500,
+        )
 
     finally:
         if cursor:
@@ -111,10 +132,13 @@ def customer_menu():
 @jwt_required()
 def change_menu_item(menu_id):
     if not is_admin_owner():
-        return """
+        return (
+            """
             <p>Not admin</p>
             <a href="/customer/menu">View customer menu</a>
-        """, 403
+        """,
+            403,
+        )
     db = None
     cursor = None
 
@@ -123,11 +147,14 @@ def change_menu_item(menu_id):
         cursor = db.cursor(dictionary=True)
 
         if request.method == "GET":
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT menu_id, cat_id, item_name, is_veg, price, is_available
                 FROM MenuItems
                 WHERE menu_id = %s
-            """, (menu_id,))
+            """,
+                (menu_id,),
+            )
 
             item = cursor.fetchone()
 
@@ -139,11 +166,14 @@ def change_menu_item(menu_id):
 
             categories = cursor.fetchall()
 
-            return render_template(
-                "change_menu.html",
-                item=item,
-                categories=categories,
-                csrf_token=get_jwt()["csrf"]
+            return (
+                render_template(
+                    "change_menu.html",
+                    item=item,
+                    categories=categories,
+                    csrf_token=get_jwt()["csrf"],
+                ),
+                200,
             )
 
         item_name = request.form.get("item_name")
@@ -152,7 +182,8 @@ def change_menu_item(menu_id):
         price = request.form.get("price")
         is_available = request.form.get("is_available")
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE MenuItems
             SET item_name = %s,
                 cat_id = %s,
@@ -160,21 +191,26 @@ def change_menu_item(menu_id):
                 price = %s,
                 is_available = %s
             WHERE menu_id = %s
-        """, (item_name, cat_id, is_veg, price, is_available, menu_id))
+        """,
+            (item_name, cat_id, is_veg, price, is_available, menu_id),
+        )
 
         db.commit()
 
-        return redirect(url_for("menu.admin_menu"))
+        return redirect(url_for("menu.admin_menu")), 303
 
     except mysql.connector.Error as err:
         if db:
             db.rollback()
 
-        return f"""
+        return (
+            f"""
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/admin/menu">Go Back</a>
-        """, 500
+        """,
+            500,
+        )
 
     finally:
         if cursor:
@@ -182,12 +218,13 @@ def change_menu_item(menu_id):
         if db:
             db.close()
 
+
 @menu_bp.route("/basket/add/<int:menu_id>", methods=["POST"])
 @jwt_required()
 def add_to_basket(menu_id):
-    
+
     user_id = int(get_jwt_identity())
-    
+
     quantity = int(request.form.get("quantity", 1))
 
     try:
@@ -196,14 +233,17 @@ def add_to_basket(menu_id):
         quantity = 0
 
     if quantity < 1 or quantity > 50:
-        return """
+        return (
+            """
         <h3>Invalid quantity.</h3>
         <a href="/customer/menu">Go Back</a>
-        """
-    
+        """,
+            400,
+        )
+
     basket = session.get("basket", {})
 
-    menu_id_str=str(menu_id)
+    menu_id_str = str(menu_id)
 
     # check how many of item is in basket
     if menu_id_str in basket:
@@ -215,7 +255,8 @@ def add_to_basket(menu_id):
     session["basket"] = basket
     session.modified = True
 
-    return redirect(url_for('menu.customer_menu'))
+    return redirect(url_for("menu.customer_menu")), 303
+
 
 @menu_bp.route("/basket", methods=["GET"])
 @jwt_required()
@@ -224,7 +265,7 @@ def view_basket():
     basket = session.get("basket", {})
 
     if not basket:
-        return render_template("basket.html", basket_items=[], total=0)
+        return render_template("basket.html", basket_items=[], total=0), 200
 
     db = None
     cursor = None
@@ -236,11 +277,14 @@ def view_basket():
         menu_ids = list(basket.keys())
         placeholders = ", ".join(["%s"] * len(menu_ids))
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             SELECT menu_id, item_name, price
             FROM MenuItems
             WHERE menu_id IN ({placeholders})
-        """, menu_ids)
+        """,
+            menu_ids,
+        )
 
         items = cursor.fetchall()
 
@@ -252,28 +296,37 @@ def view_basket():
             subtotal = float(item["price"]) * quantity
             total += subtotal
 
-            basket_items.append({
-                "menu_id": item["menu_id"],
-                "item_name": item["item_name"],
-                "price": item["price"],
-                "quantity": quantity,
-                "subtotal": subtotal
-            })
+            basket_items.append(
+                {
+                    "menu_id": item["menu_id"],
+                    "item_name": item["item_name"],
+                    "price": item["price"],
+                    "quantity": quantity,
+                    "subtotal": subtotal,
+                }
+            )
 
-        session['total'] = total
-        return render_template(
-            "basket.html",
-            basket_items=basket_items,
-            total=total,
-            csrf_token=get_jwt()["csrf"]
+        session["total"] = total
+        
+        return (
+            render_template(
+                "basket.html",
+                basket_items=basket_items,
+                total=total,
+                csrf_token=get_jwt()["csrf"],
+            ),
+            200,
         )
 
     except mysql.connector.Error as err:
-        return f"""
+        return (
+            f"""
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/customer/menu">Go Back</a>
-        """, 500
+        """,
+            500,
+        )
 
     finally:
         if cursor:
@@ -281,7 +334,9 @@ def view_basket():
         if db:
             db.close()
 
+
 @menu_bp.route("/admin/menu/delete/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def delete_menu_item(menu_id):
     db = None
     cursor = None
@@ -290,25 +345,31 @@ def delete_menu_item(menu_id):
         db = get_connection()
         cursor = db.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE MenuItems
             SET is_available = FALSE
             WHERE menu_id = %s
-        """, (menu_id,))
+        """,
+            (menu_id,),
+        )
 
         db.commit()
 
-        return redirect(url_for("menu.admin_menu"))
+        return redirect(url_for("menu.admin_menu")), 303
 
     except mysql.connector.Error as err:
         if db:
             db.rollback()
 
-        return f"""
+        return (
+            f"""
             <h3>Database Error</h3>
             <p>{err}</p>
             <a href="/admin/menu">Go Back</a>
-        """, 500
+        """,
+            500,
+        )
 
     finally:
         if cursor:
@@ -319,7 +380,13 @@ def delete_menu_item(menu_id):
 
 
 @menu_bp.route("/basket/remove/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def remove_from_basket(menu_id):
+    # if "user_id" not in session:
+    #     return redirect(url_for("auth.login")), 302
+
+    user_id = int(get_jwt_identity())
+
     basket = session.get("basket", {})
     basket.pop(str(menu_id), None)
 
