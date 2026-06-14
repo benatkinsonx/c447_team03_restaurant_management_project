@@ -65,6 +65,7 @@ def admin_menu():
 
 
 @menu_bp.route("/customer/menu", methods=["GET"])
+@jwt_required()
 def customer_menu():
     db = None
     cursor = None
@@ -90,7 +91,7 @@ def customer_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("customer_menu.html", menu_items=menu_items)
+        return render_template("customer_menu.html", menu_items=menu_items, csrf_token=get_jwt()["csrf"])
 
     except mysql.connector.Error as err:
         return f"""
@@ -184,6 +185,8 @@ def change_menu_item(menu_id):
 @jwt_required()
 def add_to_basket(menu_id):
     
+    user_id = int(get_jwt_identity())
+    
     quantity = int(request.form.get("quantity", 1))
 
     try:
@@ -260,7 +263,8 @@ def view_basket():
         return render_template(
             "basket.html",
             basket_items=basket_items,
-            total=total
+            total=total,
+            csrf_token=get_jwt()["csrf"]
         )
 
     except mysql.connector.Error as err:

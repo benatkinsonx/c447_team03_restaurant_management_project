@@ -34,6 +34,7 @@
                                     <td>
                                         <form action="/basket/add/{{ item.menu_id }}" method="post" class="inline-form">
                                             <input type="number" name="quantity" value="1" min="1" required>
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
                                             <button type="submit" class="submit-btn small-btn">Add</button>
                                         </form>
                                     </td>

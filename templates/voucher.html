@@ -21,7 +21,10 @@
                     <p>£{{ "%.2f"|format(total) }}</p>
                 </div>
 
-                <button type="submit" class="submit-btn">Next</button>
+                <form action="/voucher" method="post" class="inline-form">
+                    <button type="submit" class="submit-btn">Next</button>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
+                </form>
             </form>
         </div>
     </section>
