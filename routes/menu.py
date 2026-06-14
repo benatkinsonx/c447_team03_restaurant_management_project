@@ -8,7 +8,12 @@ menu_bp = Blueprint("menu", __name__)
 
 def is_admin_owner():
     claims = get_jwt()
-    return claims.get("role_id") in [2, 3]
+    raw = claims.get("role_id")
+    try:
+        role = int(raw) if raw is not None else None
+    except (TypeError, ValueError):
+        role = None
+    return role in [2, 3, 4]
 
 
 @menu_bp.route("/admin/menu", methods=["GET"])
