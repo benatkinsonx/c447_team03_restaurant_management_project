@@ -26,10 +26,10 @@
                     <p>£{{ "%.2f"|format(total) }}</p>
                 </div>
 
-                <form action="/delivery" methods=["post", "get"] class="inline-form">
+                <div class="form-actions">
                     <button type="submit" class="submit-btn">Next</button>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
-                </form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                </div>
             </form>
         </div>
     </section>

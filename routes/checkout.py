@@ -207,6 +207,7 @@ def payment():
         client_secret=client_secret,
         publishable_key=publishable_key,
         total=total,
+        csrf_token=get_jwt()["csrf"]
     )
 
 

@@ -48,7 +48,11 @@ def admin_menu():
 
         menu_items = cursor.fetchall()
 
-        return render_template("admin_menu.html", menu_items=menu_items)
+        return render_template(
+            "admin_menu.html",
+            menu_items=menu_items,
+            csrf_token=get_jwt()["csrf"]
+        )
 
     except mysql.connector.Error as err:
         return f"""
@@ -142,7 +146,8 @@ def change_menu_item(menu_id):
             return render_template(
                 "change_menu.html",
                 item=item,
-                categories=categories
+                categories=categories,
+                csrf_token=get_jwt()["csrf"]
             )
 
         item_name = request.form.get("item_name")
@@ -281,6 +286,7 @@ def view_basket():
             db.close()
 
 @menu_bp.route("/admin/menu/delete/<int:menu_id>", methods=["POST"])
+@jwt_required()
 def delete_menu_item(menu_id):
     db = None
     cursor = None
@@ -329,3 +335,4 @@ def remove_from_basket(menu_id):
     session.modified = True
 
     return redirect(url_for("menu.view_basket"))
+
