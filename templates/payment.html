@@ -1,39 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
+{% extends "index.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <form action="/payment" method="post">
-        <h2>3. Payment Details</h2>
-        <h3>Total: £{{ "%.2f"|format(total) }}</h3>
+{% block title %}Payment{% endblock %}
 
-        
-        <input type="hidden" name="total" value="{{ total }}">
+{% block content %}
+    <section class="booking-form">
+        <div class="form-container">
+            <h2>3. Payment Details</h2>
 
-        <label>Card Number: </label>
-        <input
-            type="text"
-            name="card_number"
-            placeholder="1234 5678 9012 3456"
-            pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
-            required
-        ><br><br>
-        <label>CVV: </label>
-        <input
-            type="text"
-            name="cvv"
-            placeholder="123"
-            pattern="[0-9]{3}"
-            required
-        ><br><br>
+            <div class="form-group">
+                <label>Total</label>
+                <p>£{{ "%.2f"|format(total) }}</p>
+            </div>
 
-        <button type="submit">Pay</button>
-    </form>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label>Card</label>
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert" class="message"></div>
+                </div>
 
-</body>
-</html>
+                <button id="submit" class="submit-btn">Pay</button>
+            </form>
+        </div>
+    </section>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe("{{ publishable_key }}");
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        card.mount('#card-element');
+
+        const form = document.getElementById('payment-form');
+        const submit = document.getElementById('submit');
+        const cardErrors = document.getElementById('card-errors');
+
+        submit.disabled = true;
+
+        card.on('change', function(event) {
+            if (event.complete) {
+                submit.disabled = false;
+                cardErrors.textContent = '';
+            } else if (event.error) {
+                submit.disabled = true;
+                cardErrors.textContent = event.error.message;
+            } else {
+                submit.disabled = true;
+                cardErrors.textContent = '';
+            }
+        });
+
+        form.addEventListener('submit', function(ev) {
+            ev.preventDefault();
+            submit.disabled = true;
+            stripe.confirmCardPayment("{{ client_secret }}", {
+                payment_method: { card: card }
+            }).then(function(result) {
+                if (result.error) {
+                    cardErrors.textContent = result.error.message;
+                    submit.disabled = false;
+                } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+                    // notify server to record order/payment
+                    fetch('/payment/confirm', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id })
+                    }).then(r => r.json()).then(data => {
+                        if (data.success) {
+                            window.location = data.redirect_url || '/dashboard';
+                        } else {
+                            cardErrors.textContent = data.error || 'Server error';
+                            submit.disabled = false;
+                        }
+                    }).catch(err => {
+                        cardErrors.textContent = err.toString();
+                        submit.disabled = false;
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

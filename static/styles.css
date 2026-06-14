@@ -290,10 +290,10 @@ a {
     border-radius: 5px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+.message {
+    color: #333;
+    font-size: 0.95rem;
+    min-height: 1.5rem;
 }
 
 .submit-btn {
@@ -308,26 +308,96 @@ a {
     margin-top: 1rem;
 }
 
-.submit-btn:hover {
-    background: #4a90d9;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .et-hero-tab {
-        font-size: 0.7rem;
+    .submit-btn.small-btn {
+        width: auto;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
     }
-    
-    .et-hero-tabs h1,
-    .et-slide h1 {
-        font-size: 1.5rem;
-        letter-spacing: 0.5rem;
+
+    .submit-btn:hover {
+        background: #4a90d9;
+    }
+
+    .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.85rem 1.5rem;
+        border-radius: 50px;
+        background: #66B1F1;
+        color: white;
+        text-decoration: none;
+        border: none;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .button.secondary {
+        background: #f3f4f6;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .button:hover,
+    .button.secondary:hover {
+        background: #4a90d9;
+        color: #fff;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 0.9rem 1rem;
+        border: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .styled-table thead {
+        background: #f3f4f6;
+    }
+
+    .styled-table tbody tr:nth-child(even) {
+        background: #fcfcfc;
+    }
+
+    .inline-form {
+        display: inline-flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .total-label {
+        margin-top: 1.5rem;
+        font-size: 1.3rem;
+    }
+
+    .small-text {
+        margin-top: 1rem;
+        color: #666;
+        font-size: 0.95rem;
     }
     
     .slide-caption h2 {
         font-size: 1rem;
     }
-}
+
 
 /* MENU */
 /* ADMIN MENU PAGE STYLES */
@@ -512,3 +582,89 @@ a {
     }
 }
 
+/* DASHBOARD STYLES */
+.dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.dashboard-header h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.welcome-message {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-message p:first-child {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.section-title {
+    color: #333;
+    font-size: 1.3rem;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #66B1F1;
+}
+
+.button-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-btn {
+    flex: 1;
+    min-width: 150px;
+    background: #66B1F1;
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.dashboard-btn:hover {
+    background: #4a90d9;
+    transform: translateY(-2px);
+}
+
+.dashboard-btn.secondary {
+    background: #6c757d;
+}
+
+.dashboard-btn.secondary:hover {
+    background: #5a6268;
+}
+
+.dashboard-btn.admin {
+    background: #28a745;
+}
+
+.dashboard-btn.admin:hover {
+    background: #218838;
+}
+
+@media (max-width: 768px) {
+    .button-row {
+        flex-direction: column;
+    }
+    
+    .dashboard-btn {
+        min-width: auto;
+    }
+}

@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+
+{% block title %}Payment History{% endblock %}
+{% block dashboard_active %}active{% endblock %}
+
+{% block content %}
+    <!-- Hero Section (same as booking page) -->
+    <section class="et-slide" id="payment-history">
+        <h1>Payment History</h1>
+        <h3>View all your past transactions</h3>
+    </section>
+
+    <!-- Payment History Content (using same booking-form styling) -->
+    <section class="booking-form">
+        <div class="form-container">
+            {% if purchase_history %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
+                                <th style="padding: 12px; text-align: left;">Order ID</th>
+                                <th style="padding: 12px; text-align: left;">Date</th>
+                                <th style="padding: 12px; text-align: left;">Order Status</th>
+                                <th style="padding: 12px; text-align: left;">Total</th>
+                                <th style="padding: 12px; text-align: left;">Payment Status</th>
+                                <th style="padding: 12px; text-align: left;">Payment Date</th>
+                                <th style="padding: 12px; text-align: left;">Amount Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in purchase_history %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px;">{{ row.order_id }}</td>
+                                    <td style="padding: 12px;">{{ row.order_date }}</td>
+                                    <td style="padding: 12px;">{{ row.order_status }}</td>
+                                    <td style="padding: 12px;">£{{ "%.2f"|format(row.total_price) }}</td>
+                                    <td style="padding: 12px;">
+                                        {% if row.payment_status == 'Completed' %}
+                                            <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                        {% elif row.payment_status == 'Pending' %}
+                                            <span style="background: #ffc107; color: #333; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                        {% elif row.payment_status == 'Failed' %}
+                                            <span style="background: #dc3545; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                        {% else %}
+                                            {{ row.payment_status or 'N/A' }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 12px;">{{ row.payment_date or 'N/A' }}</td>
+                                    <td style="padding: 12px;">{% if row.amount %}£{{ "%.2f"|format(row.amount) }}{% else %}N/A{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">You have no purchase history yet.</p>
+            {% endif %}
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <a href="/dashboard" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem; border-radius: 50px; display: block; text-align: center; font-weight: 600;">← Back to Dashboard</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
