@@ -4,13 +4,11 @@
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
-    <!-- Hero Section (same as booking page) -->
     <section class="et-slide" id="dashboard">
         <h1>Dashboard</h1>
-        <h3>Welcome, {{ session["first_name"] }}</h3>
+        <p class="message">Welcome, {{ current_user["first_name"] }}</p>
     </section>
 
-    <!-- Dashboard Options (using same booking-form styling) -->
     <section class="booking-form">
         <div class="form-container">
             <div class="form-group">

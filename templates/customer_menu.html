@@ -5,47 +5,63 @@
 {% block menu_active %}active{% endblock %}
 
 {% block content %}
+    <section class="et-slide" id="menu">
+        <h1>Our Menu</h1>
+        <h3>Discover our signature dishes crafted with passion</h3>
+    </section>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Menu</title>
-    
-    <section class="booking-form">
-        <div class="form-container">
-            <h1>Customer Menu</h1>
-            <div class="button-row">
-                <a href="/basket" class="button secondary">View Basket</a>
+    <section class="booking-form" style="padding: 2rem; max-width: 100%;">
+        <div class="form-container" style="max-width: 1200px; width: 100%; margin: 0 auto;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h1 style="color: #333; margin: 0;">Customer Menu</h1>
+                <a href="/basket" style="background: #4fa0e6; color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 50px; font-weight: 600; transition: all 0.3s;">🛒 View Basket</a>
             </div>
 
             {% if menu_items %}
-                <div class="table-container">
-                    <table class="styled-table">
+
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;">
                         <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Category</th>
-                                <th>Vegetarian</th>
-                                <th>Price</th>
-                                <th>Available</th>
-                                <th>Add</th>
+                            <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Item</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Category</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Vegetarian</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Price</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Available</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Add to Basket</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in menu_items %}
-                                <tr>
-                                    <td>{{ item.item_name }}</td>
-                                    <td>{{ item.category }}</td>
-                                    <td>{{ 'Yes' if item.is_veg else 'No' }}</td>
-                                    <td>£{{ item.price }}</td>
-                                    <td>{{ 'Yes' if item.is_available else 'No' }}</td>
-                                    <td>
-                                        <form action="/basket/add/{{ item.menu_id }}" method="post" class="inline-form">
-                                            <input type="number" name="quantity" value="1" min="1" required>
-                                            <button type="submit" class="submit-btn small-btn">Add</button>
-                                        </form>
+                                <tr style="border-bottom: 1px solid #eee; transition: background 0.3s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
+                                    <td style="padding: 15px;">
+                                        <strong>{{ item.item_name }}</strong>
+                                    </td>
+                                    <td style="padding: 15px; color: #666;">{{ item.category }}</td>
+                                    <td style="padding: 15px;">
+                                        {% if item.is_veg %}
+                                            <span style="background: #28a745; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">✓ Vegetarian</span>
+                                        {% else %}
+                                            <span style="background: #ff9800; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">Non-Veg</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 15px; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(item.price) }}</td>
+                                    <td style="padding: 15px;">
+                                        {% if item.is_available %}
+                                            <span style="background: #28a745; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">In Stock</span>
+                                        {% else %}
+                                            <span style="background: #dc3545; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">Out of Stock</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 15px;">
+                                        {% if item.is_available %}
+                                            <form action="{{ url_for('menu.add_to_basket', menu_id=item.menu_id) }}" method="post" style="display: flex; gap: 0.5rem; align-items: center;">
+                                                <input type="number" name="quantity" value="1" min="1" max="50" style="width: 70px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; text-align: center;">
+                                                <button type="submit" style="background: #66B1F1; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 5px; cursor: pointer; transition: all 0.3s; font-weight: 600;">Add</button>
+                                        {% else %}
+                                            <span style="color: #999; font-style: italic;">Not available</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -53,11 +69,11 @@
                     </table>
                 </div>
             {% else %}
-                <p>No menu items available</p>
+                <p style="text-align: center; color: #666; padding: 2rem;">No menu items available at the moment.</p>
             {% endif %}
 
-            <div class="button-row">
-                <a href="/dashboard" class="button secondary">Back to Dashboard</a>
+            <div style="margin-top: 2rem;">
+                <a href="/dashboard" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 50px; display: inline-block; font-weight: 600; transition: all 0.3s;">← Back to Dashboard</a>
             </div>
         </div>
     </section>

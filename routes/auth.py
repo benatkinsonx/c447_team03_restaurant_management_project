@@ -1,17 +1,48 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Blueprint
-import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
-from db import get_connection
-import jwt
+import os
+import re
 from datetime import datetime, timedelta, timezone
 
+from flask_jwt_extended import  create_access_token, set_access_cookies, unset_jwt_cookies 
+
+import jwt
+import mysql.connector
+from dotenv import load_dotenv
+from flask import Blueprint, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from db import get_connection
 
 auth = Blueprint("auth", __name__)
 
-# testing purpise only move to env after
-JWT_s = "test"
-JWT_a = "HS256"
+def validate_password(password):
+    if not password:
+        return "Password is required."
 
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one uppercase letter."
+
+    if not re.search(r"[a-z]", password):
+        return "Password must contain at least one lowercase letter."
+
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return "Password must contain at least one special character."
+
+    if re.search(r"\s", password):
+        return "Password must not contain spaces."
+
+    return None
+
+def get_next_page(): 
+    next_page = ( request.form.get("next") or request.args.get("next") ) 
+    if ( next_page and next_page.startswith("/") and not next_page.startswith("//") ): 
+        return next_page 
+    return url_for("dashboard.dashboard")
 
 @auth.route('/register', methods=['GET'])
 def show_register_form():
@@ -26,7 +57,7 @@ def register():
         # get personal data 
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        email = request.form.get('email')
+        email = request.form.get('email').strip().lower()
         phone_num = request.form.get('phone')         
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
@@ -39,6 +70,15 @@ def register():
 
         if password != confirm_password:
             return "<h3>Error: Passwords do not match!</h3><a href='/register'>Go Back</a>", 400
+        
+        password_error = validate_password(password)
+
+        if password_error:
+            return f"""
+                <h3>Invalid Password</h3>
+                <p>{password_error}</p>
+                <a href="/register">Go Back</a>
+            """
 
         # Secure and encrypt the user password
         password_hash = generate_password_hash(password)
@@ -63,34 +103,50 @@ def register():
         cursor.execute(user_sql, user_val)
 
         user_id = cursor.lastrowid
-
-        session["user_id"] = user_id
-        session["email"] = email
-        session["first_name"] = first_name
-        session["role_id"] = 1
-
-        # Create JWT token
-        token = jwt.encode(
-            {
-                "user_id": user_id,
+        
+        db.commit()
+        session.clear()
+        
+        access_token = create_access_token(
+            identity=str(user_id),
+            additional_claims={
                 "email": email,
                 "first_name": first_name,
-                "role_id": 1,
-                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
-            },
-            JWT_s,
-            algorithm=JWT_a
+                "role_id": 1
+            }
         )
-
-        session["jwt_token"] = token
-
-
-
-        db.commit()
         
-        return """<h1>Registration Complete!</h1>
-        <p>The account has been created successfully.</p><a href='/'>go back home to log in</a>
-        """
+        response = redirect(url_for('dashboard.dashboard'))
+        
+        set_access_cookies(response, access_token)
+        
+        return response
+
+        # session["user_id"] = user_id
+        # session["email"] = email
+        # session["first_name"] = first_name
+        # session["role_id"] = 1
+        # db.commit()
+
+        # # Create JWT token
+        # token = jwt.encode(
+        #     {
+        #         "user_id": user_id,
+        #         "email": email,
+        #         "first_name": first_name,
+        #         "role_id": 1,
+        #         "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+        #     },
+        #     JWT_SECRET,
+        #     algorithm=JWT_ALGORITHM
+        # )
+
+        # session["jwt_token"] = token
+
+
+
+        
+        # return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         # If any single query errors out, rollback the database to prevent incomplete data states
@@ -140,26 +196,44 @@ def login():
                 <h3>Invalid email or password.</h3>
                 <a href="/login">Try Again</a>
             """
+            
 
-        session['user_id'] = user['user_id']
-        session['email'] = user['email']
-        session['first_name'] = user['first_name']
-        session['role_id'] = user['role_id']
-
-        token = jwt.encode(
-            {
-                "user_id": user['user_id'],
-                "email": user["email"],
-                "role_id": user["role_id"],
-                "exp": datetime.now(timezone.utc) + timedelta(hours=2)
-            },
-            JWT_s,
-            algorithm=JWT_a
+        session.clear()
+        
+        access_token = create_access_token(
+            identity=str(user["user_id"]),
+            additional_claims={
+                "email": email,
+                "first_name": user["first_name"],
+                "role_id": user["role_id"]
+            }
         )
+        
+        response = redirect(url_for('dashboard.dashboard'))
+        
+        set_access_cookies(response, access_token)
+        
+        return response
 
-        session["jwt_token"] = token
+        # session['user_id'] = user['user_id']
+        # session['email'] = user['email']
+        # session['first_name'] = user['first_name']
+        # session['role_id'] = user['role_id']
 
-        return redirect(url_for("dashboard.dashboard"))
+        # token = jwt.encode(
+        #     {
+        #         "user_id": user['user_id'],
+        #         "email": user["email"],
+        #         "role_id": user["role_id"],
+        #         "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+        #     },
+        #     JWT_SECRET,
+        #     algorithm=JWT_ALGORITHM
+        # )
+
+        # session["jwt_token"] = token
+
+        # return redirect(url_for("dashboard.dashboard"))
 
     except mysql.connector.Error as err:
         return f"""
@@ -179,5 +253,10 @@ def login():
 @auth.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('home'))
+    
+    response = redirect(url_for('home'))
+    
+    unset_jwt_cookies(response)
+    
+    return response
     
