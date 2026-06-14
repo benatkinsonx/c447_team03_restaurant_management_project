@@ -30,7 +30,7 @@ def dashboard():
         "role_id": role_id,
     }
 
-    return render_template("dash.html", current_user=current_user)
+    return render_template("dash.html", current_user=current_user), 200
 
 
 @dashboard_route.route("/payment_history")
@@ -63,7 +63,7 @@ def payment_history():
         """, (user_id,))
 
         purchase_history = cursor.fetchall()
-        return render_template("payment_history.html", purchase_history=purchase_history)
+        return render_template("payment_history.html", purchase_history=purchase_history), 200
     except Exception as e:
         return f"<h3>Database Error</h3><p>{e}</p><a href=\"/dashboard\">Back to Dashboard</a>", 500
     finally:
