@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aura-app
+  labels:
+    app: aura-app
+
+spec:
+  containers:
+    - name: aura-app
+      image: aura-app:v1
+      imagePullPolicy: Never
+
+      env:
+        - name: DB_HOST
+          value: "host.minikube.internal"
+        - name: DB_USER
+          value: "your_db_user"
+        - name: DB_PASSWORD
+          value: "your_db_password"
+        - name: DB_NAME
+          value: "your_database_name"
+        - name: DB_PORT
+          value: "3306"
+
+        - name: FLASK_SECRET_KEY
+          value: "replace_with_flask_secret_key"
+        - name: JWT_SECRET_KEY
+          value: "replace_with_jwt_secret_key"
+        - name: JWT_ALGORITHM
+          value: "HS256"
+        - name: JWT_COOKIE_SECURE
+          value: "false"
+        - name: SESSION_COOKIE_SECURE
+          value: "false"
+
+        - name: STRIPE_SECRET_KEY
+          value: "sk_test_replace_with_your_test_secret_key"
+        - name: STRIPE_PUBLISHABLE_KEY
+          value: "pk_test_replace_with_your_test_publishable_key"
+
+      ports:
+        - containerPort: 5005

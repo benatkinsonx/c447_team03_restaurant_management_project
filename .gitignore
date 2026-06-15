@@ -9,4 +9,4 @@ __pycache__
 *.pyc
 
 #yaml config files
-*.yaml
+minikubectl-env.yaml
