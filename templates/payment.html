@@ -3,32 +3,47 @@
 {% block title %}Payment{% endblock %}
 
 {% block content %}
+    <section class="et-slide" id="payment">
+        <h1>Payment</h1>
+        <h3>Complete your order with secure payment</h3>
+    </section>
+
     <section class="booking-form">
         <div class="form-container">
-            <h2>3. Payment Details</h2>
+            <h2 style="color: #333; margin-bottom: 1.5rem; font-size: 1.3rem;">3. Payment Details</h2>
 
             <div class="form-group">
                 <label>Total</label>
-                <p>£{{ "%.2f"|format(total) }}</p>
+                <p style="font-size: 1.5rem; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(total) }}</p>
             </div>
 
             <form id="payment-form" action="/payment" method="post">
                 <div class="form-group">
-                    <label>Card</label>
-                    <div id="card-element"></div>
-                    <div id="card-errors" role="alert" class="message"></div>
+                    <label>Card Details</label>
+                    <div id="card-element" style="padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; background: white;"></div>
+                    <div id="card-errors" role="alert" class="message" style="color: #dc3545; margin-top: 0.5rem; font-size: 0.8rem;"></div>
                 </div>
 
-                <button id="submit" class="submit-btn">Pay</button>
+                <button id="submit" class="submit-btn">Pay →</button>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             </form>
         </div>
     </section>
+
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         const stripe = Stripe("{{ publishable_key }}");
         const elements = stripe.elements();
-        const card = elements.create('card');
+        const card = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    fontFamily: '"Century Gothic", Lato, sans-serif',
+                    color: '#32325d',
+                    '::placeholder': { color: '#aab7c4' }
+                }
+            }
+        });
         card.mount('#card-element');
 
         const form = document.getElementById('payment-form');
@@ -53,14 +68,15 @@
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
             submit.disabled = true;
+            submit.textContent = 'Processing...';
             stripe.confirmCardPayment("{{ client_secret }}", {
                 payment_method: { card: card }
             }).then(function(result) {
                 if (result.error) {
                     cardErrors.textContent = result.error.message;
                     submit.disabled = false;
+                    submit.textContent = 'Pay →';
                 } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-                    // notify server to record order/payment
                     fetch('/payment/confirm', {
                         method: 'POST',
                         credentials: 'same-origin',
@@ -82,10 +98,12 @@
                         } else {
                             cardErrors.textContent = data.error || 'Server error';
                             submit.disabled = false;
+                            submit.textContent = 'Pay →';
                         }
                     }).catch(err => {
                         cardErrors.textContent = err.toString();
                         submit.disabled = false;
+                        submit.textContent = 'Pay →';
                     });
                 }
             });

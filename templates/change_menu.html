@@ -1,56 +1,66 @@
-<!doctype html>
-<html lang="en">
+{% extends "index.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Menu Item</title>
-</head>
+{% block title %}Change Menu Item{% endblock %}
+{% block menu_active %}active{% endblock %}
 
-<body>
-    <h1>Change Menu Item</h1>
+{% block content %}
+    <section class="et-slide" id="change-menu">
+        <h1>Change Menu Item</h1>
+        <h3>Update item details</h3>
+    </section>
 
-    <form action="/admin/menu/change/{{ item.menu_id }}" method="post">
+    <section class="booking-form">
+        <div class="form-container" style="max-width: 600px;">
+            <form action="/admin/menu/change/{{ item.menu_id }}" method="post">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" name="item_name" value="{{ item.item_name }}" required>
+                </div>
 
-        <label>Item name:</label><br>
-        <input type="text" name="item_name" value="{{ item.item_name }}" required>
-        <br><br>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="cat_id" required>
+                        {% for category in categories %}
+                            <option value="{{ category.cat_id }}"
+                                {% if category.cat_id == item.cat_id %}selected{% endif %}>
+                                {{ category.category }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <label>Category:</label><br>
-        <select name="cat_id" required>
-            {% for category in categories %}
-                <option value="{{ category.cat_id }}"
-                    {% if category.cat_id == item.cat_id %}selected{% endif %}>
-                    {{ category.category }}
-                </option>
-            {% endfor %}
-        </select>
-        <br><br>
+                <div class="form-group">
+                    <label>Vegetarian</label>
+                    <select name="is_veg" required>
+                        <option value="1" {% if item.is_veg %}selected{% endif %}>Yes</option>
+                        <option value="0" {% if not item.is_veg %}selected{% endif %}>No</option>
+                    </select>
+                </div>
 
-        <label>Veg:</label><br>
-        <select name="is_veg" required>
-            <option value="1" {% if item.is_veg %}selected{% endif %}>True</option>
-            <option value="0" {% if not item.is_veg %}selected{% endif %}>False</option>
-        </select>
-        <br><br>
+                <div class="form-group">
+                    <label>Price (£)</label>
+                    <input type="number" step="0.01" name="price" value="{{ item.price }}" required>
+                </div>
 
-        <label>Price:</label><br>
-        <input type="number" step="0.01" name="price" value="{{ item.price }}" required>
-        <br><br>
+                <div class="form-group">
+                    <label>Available</label>
+                    <select name="is_available" required>
+                        <option value="1" {% if item.is_available %}selected{% endif %}>In Stock</option>
+                        <option value="0" {% if not item.is_available %}selected{% endif %}>Out of Stock</option>
+                    </select>
+                </div>
 
-        <label>Available:</label><br>
-        <select name="is_available" required>
-            <option value="1" {% if item.is_available %}selected{% endif %}>True</option>
-            <option value="0" {% if not item.is_available %}selected{% endif %}>False</option>
-        </select>
-        <br><br>
+                <div class="form-row">
+                    <div class="form-group">
+                        <button type="submit" class="submit-btn">Save Changes →</button>
+                    </div>
+                    <div class="form-group">
+                        <a href="/admin/menu" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem; border-radius: 50px; display: block; text-align: center; font-weight: 600;">Cancel</a>
+                    </div>
+                </div>
 
-        <form action="/admin/menu/delete/{{ item.menu_id }}" method="post" class="inline-form">
-            <button type="submit" class="submit-btn">Save</button>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
-        </form>
-        <a href="/admin/menu">Cancel</a>
-    </form>
-</body>
-
-</html>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            </form>
+        </div>
+    </section>
+{% endblock %}

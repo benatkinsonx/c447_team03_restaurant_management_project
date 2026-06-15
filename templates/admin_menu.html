@@ -62,119 +62,154 @@
     <a href="/dashboard">Back to Dashboard</a>
 </body>
 </html> -->
-
 {% extends "index.html" %}
 
 {% block title %}Admin Menu{% endblock %}
+{% block menu_active %}active{% endblock %}
 
 {% block content %}
+    <section class="et-slide" id="admin-menu">
+        <h1>Admin Menu</h1>
+        <h3>Manage restaurant menu items</h3>
+    </section>
 
-<section class="et-slide">
-    <h1>Admin Menu</h1>
-    <h3>Manage restaurant menu items</h3>
-</section>
+    <section class="booking-form" style="padding: 2rem; max-width: 100%;">
+        <div class="form-container" style="max-width: 1200px; width: 100%; margin: 0 auto;">
+            <div style="margin-bottom: 2rem;">
+                <a href="/dashboard" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 50px; display: inline-block; font-weight: 600; transition: all 0.3s;">← Back to Dashboard</a>
+            </div>
 
-<section class="menu-page">
-    <div class="menu-container">
-
-        <div class="menu-actions">
-            <a href="{{ url_for('dashboard.dashboard') }}">
-                <button type="button" class="menu-button">
-                    Back to Dashboard
-                </button>
-            </a>
-        </div>
-
-        {% if menu_items %}
-
-            <div class="menu-table-container">
-                <table class="menu-table">
-
-                    <thead>
-                        <tr>
-                            <!-- <th>ID</th> -->
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th>Vegetarian</th>
-                            <th>Price</th>
-                            <th>Available</th>
-                            <th>Change</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for item in menu_items %}
-                            <tr>
-                                <!-- <td>{{ item.menu_id }}</td> -->
-                                <td>{{ item.item_name }}</td>
-                                <td>{{ item.category }}</td>
-                                <td>{{ item.category_desc }}</td>
-
-                                <td>
-                                    {% if item.is_veg %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-
-                                <td>£{{ "%.2f"|format(item.price) }}</td>
-
-                                <td>
-                                    {% if item.is_available %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    <a href="{{ url_for(
-                                        'menu.change_menu_item',
-                                        menu_id=item.menu_id
-                                    ) }}">
-                                        <button type="button" class="menu-button">
-                                            Change
-                                        </button>
-                                    </a>
-                                </td>
-
-                                <td>
-                                    <form
-                                        action="{{ url_for(
-                                            'menu.delete_menu_item',
-                                            menu_id=item.menu_id
-                                        ) }}"
-                                        method="POST"
-                                    >
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                                        <button
-                                            type="submit"
-                                            class="menu-button-danger"
-                                            onclick="return confirm('Delete this menu item?');"
-                                        >
-                                            Delete
-                                        </button>
-                                    </form>
-                                </td>
+            {% if menu_items %}
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Item</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Category</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Description</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Vegetarian</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Price</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Available</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Change</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            {% for item in menu_items %}
+                                <tr style="border-bottom: 1px solid #eee; transition: background 0.3s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
+                                    <td style="padding: 15px;"><strong>{{ item.item_name }}</strong></td>
+                                    <td style="padding: 15px; color: #666;">{{ item.category }}</td>
+                                    <td style="padding: 15px; color: #666;">{{ item.category_desc }}</td>
+                                    <td style="padding: 15px;">
+                                        {% if item.is_veg %}
+                                            <span style="background: #28a745; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Yes</span>
+                                        {% else %}
+                                            <span style="background: #ff9800; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 15px; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(item.price) }}</td>
+                                    <td style="padding: 15px;">
+                                        <label class="switch">
+                                            <input type="checkbox" class="availability-toggle" data-menu-id="{{ item.menu_id }}" {% if item.is_available %}checked{% endif %}>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </td>
+                                    <td style="padding: 15px;">
+                                        <a href="{{ url_for('menu.change_menu_item', menu_id=item.menu_id) }}" style="background: #66B1F1; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; display: inline-block; font-size: 0.8rem; transition: all 0.3s;">Change</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem;">
+                    <p style="color: #666;">No menu items available.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
 
-                </table>
-            </div>
+{% block scripts %}
+<style>
+    /* Toggle Switch Styles */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
 
-        {% else %}
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
-            <div class="menu-empty">
-                <h3>No menu items available.</h3>
-            </div>
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #dc3545;
+        transition: 0.3s;
+        border-radius: 24px;
+    }
 
-        {% endif %}
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
 
-    </div>
-</section>
+    input:checked + .slider {
+        background-color: #28a745;
+    }
 
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggles = document.querySelectorAll('.availability-toggle');
+        
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const menuId = this.getAttribute('data-menu-id');
+                const isAvailable = this.checked ? 1 : 0;
+                
+                fetch(`/admin/menu/toggle/${menuId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ is_available: isAvailable })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        this.checked = !this.checked;
+                        alert('Failed to update availability');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.checked = !this.checked;
+                    alert('An error occurred');
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}

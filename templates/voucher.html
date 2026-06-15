@@ -3,28 +3,35 @@
 {% block title %}Voucher{% endblock %}
 
 {% block content %}
+    <section class="et-slide" id="voucher">
+        <h1>Voucher</h1>
+        <h3>Apply your voucher code or reward points</h3>
+    </section>
+
     <section class="booking-form">
         <div class="form-container">
             <form action="/voucher" method="post">
-                <h2>1. Voucher Code (Optional)</h2>
+                <h2 style="color: #333; margin-bottom: 1rem; font-size: 1.3rem;">1. Voucher Code (Optional)</h2>
+                
                 <div class="form-group">
                     <label>You have {{ curr_reward_points }} reward points</label>
                     <input type="text" name="voucher_code" placeholder="Enter voucher code">
                 </div>
 
-                <div class="form-group">
-                    <p class="message">{{ message|safe }}</p>
-                </div>
+                {% if message %}
+                    <div class="form-group">
+                        <p style="color: #28a745; font-weight: 600;">{{ message|safe }}</p>
+                    </div>
+                {% endif %}
 
                 <div class="form-group">
                     <label>Total</label>
-                    <p>£{{ "%.2f"|format(total) }}</p>
+                    <p style="font-size: 1.5rem; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(total) }}</p>
                 </div>
 
-                <form action="/voucher" method="post" class="inline-form">
-                    <button type="submit" class="submit-btn">Next</button>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" >
-                </form>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                
+                <button type="submit" class="submit-btn">Next →</button>
             </form>
         </div>
     </section>

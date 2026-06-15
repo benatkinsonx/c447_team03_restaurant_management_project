@@ -4,60 +4,71 @@
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
-    <!-- Hero Section (same as booking page) -->
     <section class="et-slide" id="payment-history">
         <h1>Payment History</h1>
         <h3>View all your past transactions</h3>
     </section>
 
-    <!-- Payment History Content (using same booking-form styling) -->
-    <section class="booking-form">
-        <div class="form-container">
+    <section class="booking-form" style="padding: 2rem; max-width: 100%;">
+        <div class="form-container" style="max-width: 1200px; width: 100%; margin: 0 auto;">
             {% if purchase_history %}
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;">
                         <thead>
-                            <tr style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
-                                <th style="padding: 12px; text-align: left;">Order ID</th>
-                                <th style="padding: 12px; text-align: left;">Date</th>
-                                <th style="padding: 12px; text-align: left;">Order Status</th>
-                                <th style="padding: 12px; text-align: left;">Total</th>
-                                <th style="padding: 12px; text-align: left;">Payment Status</th>
-                                <th style="padding: 12px; text-align: left;">Payment Date</th>
-                                <th style="padding: 12px; text-align: left;">Amount Paid</th>
+                            <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Order ID</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Date</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Order Status</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Total</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Payment Status</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Payment Date</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Amount Paid</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in purchase_history %}
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 12px;">{{ row.order_id }}</td>
-                                    <td style="padding: 12px;">{{ row.order_date }}</td>
-                                    <td style="padding: 12px;">{{ row.order_status }}</td>
-                                    <td style="padding: 12px;">£{{ "%.2f"|format(row.total_price) }}</td>
-                                    <td style="padding: 12px;">
+                                <tr style="border-bottom: 1px solid #eee; transition: background 0.3s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
+                                    <td style="padding: 15px;"><strong>{{ row.order_id }}</strong></td>
+                                    <td style="padding: 15px; color: #666;">{{ row.order_date }}</td>
+                                    <td style="padding: 15px;">
+                                        {% if row.order_status == 'Completed' %}
+                                            <span style="background: #28a745; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.order_status }}</span>
+                                        {% elif row.order_status == 'Pending' %}
+                                            <span style="background: #ffc107; color: #333; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.order_status }}</span>
+                                        {% elif row.order_status == 'Cancelled' %}
+                                            <span style="background: #dc3545; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.order_status }}</span>
+                                        {% else %}
+                                            {{ row.order_status }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 15px; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(row.total_price) }}</td>
+                                    <td style="padding: 15px;">
                                         {% if row.payment_status == 'Completed' %}
-                                            <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                            <span style="background: #28a745; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status }}</span>
                                         {% elif row.payment_status == 'Pending' %}
-                                            <span style="background: #ffc107; color: #333; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                            <span style="background: #ffc107; color: #333; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status }}</span>
                                         {% elif row.payment_status == 'Failed' %}
-                                            <span style="background: #dc3545; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status or 'N/A' }}</span>
+                                            <span style="background: #dc3545; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">{{ row.payment_status }}</span>
                                         {% else %}
                                             {{ row.payment_status or 'N/A' }}
                                         {% endif %}
                                     </td>
-                                    <td style="padding: 12px;">{{ row.payment_date or 'N/A' }}</td>
-                                    <td style="padding: 12px;">{% if row.amount %}£{{ "%.2f"|format(row.amount) }}{% else %}N/A{% endif %}</td>
+                                    <td style="padding: 15px; color: #666;">{{ row.payment_date or 'N/A' }}</td>
+                                    <td style="padding: 15px; font-weight: 600;">{% if row.amount %}£{{ "%.2f"|format(row.amount) }}{% else %}N/A{% endif %}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             {% else %}
-                <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">You have no purchase history yet.</p>
+                <div style="text-align: center; padding: 3rem;">
+                    <p style="color: #666; margin-bottom: 1.5rem;">You have no purchase history yet.</p>
+                    <a href="/customer/menu" style="background: #66B1F1; color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 50px; display: inline-block; font-weight: 600; transition: all 0.3s;">Browse Menu →</a>
+                </div>
             {% endif %}
 
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <a href="/dashboard" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem; border-radius: 50px; display: block; text-align: center; font-weight: 600;">← Back to Dashboard</a>
+            <div style="margin-top: 2rem;">
+                <a href="/dashboard" style="background: #6c757d; color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 50px; display: inline-block; font-weight: 600; transition: all 0.3s;">← Back to Dashboard</a>
             </div>
         </div>
     </section>

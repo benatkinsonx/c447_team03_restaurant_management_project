@@ -11,19 +11,14 @@ booking_bp = Blueprint("bookings", __name__)
 @booking_bp.route("/bookings", methods=["GET"])
 @jwt_required()
 def bookings():
-    # if "user_id" not in session:
-    #     return redirect(url_for("auth.login", next=request.path))
-
-    # return render_template("bookings.html", today=date.today().isoformat())
-    return render_template( "bookings.html", today=date.today().isoformat(), csrf_token=get_jwt()["csrf"] ), 200
+    return render_template( "bookings.html", 
+                           today=date.today().isoformat(), 
+                           csrf_token=get_jwt()["csrf"] ), 200
 
 
 @booking_bp.route("/submitbooking", methods=["POST"])
 @jwt_required()
-def submit_booking():
-    # if "user_id" not in session:
-    #     return redirect(url_for("auth.login", next=url_for("bookings.bookings")))
-    
+def submit_booking(): 
     user_id = int(get_jwt_identity())
 
     booking_date = request.form.get("date")

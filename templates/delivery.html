@@ -3,33 +3,40 @@
 {% block title %}Delivery{% endblock %}
 
 {% block content %}
+    <section class="et-slide" id="delivery">
+        <h1>Delivery Options</h1>
+        <h3>Choose collection or delivery for your order</h3>
+    </section>
+
     <section class="booking-form">
         <div class="form-container">
             <form action="/delivery" method="post">
-                <h2>2. Delivery</h2>
+                <h2 style="color: #333; margin-bottom: 1.5rem; font-size: 1.3rem;">2. Delivery</h2>
 
                 <div class="form-group">
-                    <input type="radio" id="collection" name="delivery" value="collection" required>
-                    <label for="collection">Collection</label>
+                    <input type="radio" id="collection" name="delivery" value="collection" required style="margin-right: 0.5rem;">
+                    <label for="collection" style="font-weight: 600;">Collection</label>
                 </div>
+                
                 <div class="form-group">
-                    <input type="radio" id="delivery" name="delivery" value="delivery">
-                    <label for="delivery">Delivery (+ £5.00)</label>
+                    <input type="radio" id="delivery" name="delivery" value="delivery" style="margin-right: 0.5rem;">
+                    <label for="delivery" style="font-weight: 600;">Delivery (+ £5.00)</label>
                 </div>
 
-                <div class="form-group">
-                    <p class="message">{{ message|safe }}</p>
-                </div>
+                {% if message %}
+                    <div class="form-group">
+                        <p style="color: #28a745; font-weight: 600;">{{ message|safe }}</p>
+                    </div>
+                {% endif %}
 
                 <div class="form-group">
                     <label>Total</label>
-                    <p>£{{ "%.2f"|format(total) }}</p>
+                    <p style="font-size: 1.5rem; font-weight: 600; color: #66B1F1;">£{{ "%.2f"|format(total) }}</p>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="submit-btn">Next</button>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                
+                <button type="submit" class="submit-btn">Next →</button>
             </form>
         </div>
     </section>
